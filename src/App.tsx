@@ -55,7 +55,7 @@ export default function App() {
 
       <motion.ul className={s.list} layout style={{ listStyle: 'none', margin: 0, padding: 0 }}>
         <AnimatePresence initial={false}>
-          {visible.slice(0, 200).map(e => {
+          {visible.slice(0, 80).map(e => {
             const t = textOf(e)
             return (
               <motion.li key={e.id} className={s.row} layout
@@ -87,7 +87,7 @@ export default function App() {
                   <div className={s.sheetBody}>
                     <p className={s.lead}>
                       You have <Count n={sum.empty} i={0} /> empty transcripts, <Count n={sum.short} i={1} /> under 20 characters,
-                      and <Count n={sum.flagged} i={2} /> you flagged yourself. That's about <b>{Math.round(1 / Math.max(sum.share, 0.01))}</b> in every {Math.round(1 / Math.max(sum.share, 0.01)) === 1 ? 'entry' : `${Math.round(1 / Math.max(sum.share, 0.01))}`}.
+                      and <Count n={sum.flagged} i={2} /> you flagged yourself. That's about <b>1 in every {Math.max(2, Math.round(1 / Math.max(sum.share, 0.01)))}</b>.
                     </p>
                     <p className={s.hint}>Nothing is removed until you've looked. Anything swept can be restored.</p>
                   </div>
