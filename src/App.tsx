@@ -1,173 +1,193 @@
-import { useEffect, useMemo, useState } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { AnimatePresence } from 'motion/react'
 import s from './App.module.scss'
 import { entries as allEntries, usingRealData } from './data/load.ts'
 import { detect, summarize, appLabel, textOf, DEFAULT_THRESHOLD } from './sweep/detect.ts'
-import type { Candidate, Reason } from './data/types.ts'
-import { when, secs, pct } from './format.ts'
-import { Search, Check, Undo2, X, RotateCcw, Broom } from './icons.ts'
+import type { Candidate, Entry, Reason, SweptItem } from './data/types.ts'
+import { OPT_IN } from './sweep/labels.ts'
+import {
+  now as clock, demoReminder, HOLD_DAYS, leavesOn, isExpired,
+  loadSwept, saveSwept, loadGone, saveGone, loadDismissed, saveDismissed,
+} from './sweep/holding.ts'
+import { toDate, dayKey, dayLabel, startOfDay } from './format.ts'
+import { Titlebar, Sidebar, Banner, Stats } from './components/Chrome.tsx'
+import { HistoryList } from './components/HistoryList.tsx'
+import { HoldingCell } from './components/HoldingCell.tsx'
+import { Reminder } from './components/Reminder.tsx'
+import { SweepDialog, Confirm } from './components/Dialogs.tsx'
+import { Search, Broom, ArrowLeft, RotateCcw } from './icons.ts'
 
-type View = 'history' | 'summary' | 'review'
-const REASON_LABEL: Record<Reason, string> = { empty: 'Empty', cutoff: 'Cut off', flagged: 'Flagged by you', reply: 'Short replies' }
-// Replies go last and start closed: they are finished thoughts, listed so the choice stays yours.
-const ORDER: Reason[] = ['empty', 'cutoff', 'flagged', 'reply']
+const DAY = 864e5
+const byId = new Map<string, Entry>(allEntries.map(e => [e.id, e]))
+// Reason at classification time, so the holding cell can say why a row was swept.
+const reasonOf = new Map<string, Reason>(detect(allEntries).map(c => [c.entry.id, c.reason]))
+const totalWords = allEntries.reduce((n, e) => n + (textOf(e).match(/\S+/g)?.length ?? 0), 0)
 
 export default function App() {
-  const [view, setView] = useState<View>('history')
-  const [q, setQ] = useState('')
-  const [threshold, setThreshold] = useState(DEFAULT_THRESHOLD)
-  const [kept, setKept] = useState<Set<string>>(new Set())
-  const [swept, setSwept] = useState<string[]>([])
-  const [sweptOpen, setSweptOpen] = useState(false)
-  const [repliesOpen, setRepliesOpen] = useState(false)
+  // The concept's clock: ?day=N moves it forward so the 7-day hold can be seen without waiting.
+  const [t] = useState(() => clock())
+  const today = dayKey(t)
 
-  const live = useMemo(() => allEntries.filter(e => !swept.includes(e.id)), [swept])
+  const [gone, setGone] = useState<string[]>(loadGone)
+  const [swept, setSwept] = useState<SweptItem[]>(() => {
+    let items = loadSwept()
+    // Expired rows leave for good on load.
+    const expired = items.filter(it => isExpired(it, clock()))
+    if (expired.length) {
+      items = items.filter(it => !isExpired(it, clock()))
+      saveGone([...loadGone(), ...expired.map(it => it.id)])
+    }
+    // ?demo=reminder seeds a batch that leaves tonight.
+    if (demoReminder && !items.length) {
+      const cands = detect(allEntries).filter(c => !OPT_IN.includes(c.reason) && c.confidence >= DEFAULT_THRESHOLD)
+      const take = (r: Reason, n: number) => cands.filter(c => c.reason === r).slice(0, n)
+      items = [...take('empty', 8), ...take('cutoff', 3), ...take('flagged', 1)]
+        .map(c => ({ id: c.entry.id, sweptAt: clock() - HOLD_DAYS * DAY }))
+    }
+    return items
+  })
+  const [view, setView] = useState<'history' | 'cell'>('history')
+  const [q, setQ] = useState('')
+  const [sweepOpen, setSweepOpen] = useState(false)
+  const [confirmEmpty, setConfirmEmpty] = useState(false)
+  const [choices, setChoices] = useState<Map<string, boolean>>(new Map())
+  const [dismissed, setDismissed] = useState<string | null>(loadDismissed)
+
+  useEffect(() => { saveSwept(swept) }, [swept])
+  useEffect(() => { saveGone(gone) }, [gone])
+
+  const sweptIds = useMemo(() => new Set(swept.map(it => it.id)), [swept])
+  const goneIds = useMemo(() => new Set(gone), [gone])
+  const live = useMemo(() => allEntries.filter(e => !sweptIds.has(e.id) && !goneIds.has(e.id)), [sweptIds, goneIds])
   const cands = useMemo(() => detect(live), [live])
   const sum = useMemo(() => summarize(live, cands), [live, cands])
-  const selected = (c: Candidate) => c.confidence >= threshold && !kept.has(c.entry.id)
-  const toSweep = cands.filter(selected)
-  const visible = live.filter(e => !q || textOf(e).toLowerCase().includes(q.toLowerCase()) || appLabel(e.app).toLowerCase().includes(q.toLowerCase()))
+  const visible = useMemo(() => {
+    const needle = q.trim().toLowerCase()
+    if (!needle) return live
+    return live.filter(e => textOf(e).toLowerCase().includes(needle) || appLabel(e.app).toLowerCase().includes(needle))
+  }, [live, q])
+
+  // Selected = the classifier's default unless the person said otherwise.
+  const selected = useCallback((c: Candidate) => {
+    const own = choices.get(c.entry.id)
+    if (own !== undefined) return own
+    return !OPT_IN.includes(c.reason) && c.confidence >= DEFAULT_THRESHOLD
+  }, [choices])
+  const setMany = useCallback((ids: string[], on: boolean) => {
+    setChoices(prev => { const n = new Map(prev); for (const id of ids) n.set(id, on); return n })
+  }, [])
+
+  const sweep = () => {
+    const chosen = cands.filter(selected).map(c => ({ id: c.entry.id, sweptAt: t }))
+    setSwept(prev => [...chosen, ...prev])
+    setChoices(new Map())
+    setSweepOpen(false)
+  }
+  const restore = (id: string) => setSwept(prev => prev.filter(it => it.id !== id))
+  const restoreAll = () => { setSwept([]); setView('history') }
+  const emptyNow = () => {
+    setGone(prev => [...prev, ...swept.map(it => it.id)])
+    setSwept([])
+    setConfirmEmpty(false)
+    setView('history')
+  }
+
+  // The reminder shows only on a day a batch reaches the end of its hold.
+  const leavingToday = useMemo(() => swept.filter(it => leavesOn(it) === startOfDay(t)), [swept, t])
+  const showReminder = leavingToday.length > 0 && dismissed !== today && view === 'history'
+  const leavingCounts = useMemo(() => {
+    const out: Partial<Record<Reason, number>> = {}
+    for (const it of leavingToday) { const r = reasonOf.get(it.id) ?? 'empty'; out[r] = (out[r] ?? 0) + 1 }
+    return out
+  }, [leavingToday])
+  const keepLeaving = () => {
+    const ids = new Set(leavingToday.map(it => it.id))
+    setSwept(prev => prev.filter(it => !ids.has(it.id)))
+  }
+  const dismiss = () => { setDismissed(today); saveDismissed(today) }
 
   useEffect(() => {
-    const onKey = (ev: KeyboardEvent) => { if (ev.key === 'Escape') { if (view !== 'history') setView('history'); else setSweptOpen(false) } }
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && view === 'cell' && !sweepOpen && !confirmEmpty) setView('history') }
     window.addEventListener('keydown', onKey); return () => window.removeEventListener('keydown', onKey)
-  }, [view])
+  }, [view, sweepOpen, confirmEmpty])
 
-  const toggleKeep = (id: string) => setKept(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n })
-  const sweep = () => { setSwept(prev => [...toSweep.map(c => c.entry.id), ...prev]); setView('history'); setSweptOpen(true) }
-  const restore = (id: string) => setSwept(prev => prev.filter(x => x !== id))
-  const restoreAll = () => { setSwept([]); setSweptOpen(false) }
-  const sweptEntries = swept.map(id => allEntries.find(e => e.id === id)!).filter(Boolean)
+  const firstDay = visible[0] ? dayLabel(toDate(visible[0].timestamp).getTime(), t) : 'Today'
 
   return (
-    <div className={s.shell}>
-      <header className={s.top}>
-        <h1 className={s.title}>History</h1>
-        <label className={s.search}><Search size={16} /><input placeholder="Search transcripts" value={q} onChange={e => setQ(e.target.value)} aria-label="Search transcripts" /></label>
-        <button className={s.iconBtn} data-active={view !== 'history'} aria-label={`Sweep, ${sum.candidates} candidates`} title="Sweep" onClick={() => setView('summary')}>
-          <Broom size={18} />
-          {sum.candidates > 0 && <span className={s.badge}>{sum.candidates}</span>}
-        </button>
-        {swept.length > 0 && (
-          <button className={s.iconBtn} aria-label={`Swept, ${swept.length}`} title="Swept" onClick={() => setSweptOpen(o => !o)} data-active={sweptOpen}>
-            <Undo2 size={18} /><span className={s.badge}>{swept.length}</span>
-          </button>
-        )}
-      </header>
+    <div className={s.window}>
+      <Titlebar />
+      <Sidebar />
+      <div className={s.panel}>
+        <div className={s.content}>
+          <h1 className={s.welcome}>Welcome back, Daniel</h1>
 
-      <motion.ul className={s.list} layout style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-        <AnimatePresence initial={false}>
-          {visible.slice(0, 80).map(e => {
-            const t = textOf(e)
-            return (
-              <motion.li key={e.id} className={s.row} layout
-                initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8, transition: { duration: .18 } }}
-                transition={{ duration: .22, ease: [.2, .8, .2, 1] }}>
-                <span className={s.app}>{appLabel(e.app)}</span>
-                <span className={t ? s.text : s.empty}>{t || 'Empty'}</span>
-                <span className={s.meta}>{when(e.timestamp)}{e.duration != null ? ` · ${secs(e.duration)}` : ''}</span>
-              </motion.li>
-            )
-          })}
-        </AnimatePresence>
-      </motion.ul>
-      <p className={s.foot}><span>{live.length} transcripts</span><span>{usingRealData ? 'Real history, local only' : 'Sample data'}</span></p>
+          <div className={s.main}>
+            <Banner />
 
-      <AnimatePresence>
-        {view !== 'history' && (
-          <>
-            <motion.div key="scrim" className={s.scrim} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setView('history')} />
-            <motion.section key="sheet" className={s.sheet} role="dialog" aria-modal="true" aria-labelledby="sheetTitle"
-              initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 30, opacity: 0 }} transition={{ duration: .26, ease: [.2, .8, .2, 1] }}>
-              <div className={s.sheetHead}>
-                <h2 id="sheetTitle" className={s.sheetTitle}>{view === 'summary' ? 'Sweep' : `Review ${sum.candidates}`}</h2>
-                <button className={s.iconBtn} aria-label="Close" onClick={() => setView('history')}><X size={16} /></button>
-              </div>
-
-              {view === 'summary' && (
+            <div className={s.bar}>
+              {view === 'cell' ? (
                 <>
-                  <div className={s.sheetBody}>
-                    <p className={s.lead}>
-                      You have <Count n={sum.empty} i={0} /> empty transcripts, <Count n={sum.cutoff} i={1} /> that cut off mid-thought,
-                      and <Count n={sum.flagged} i={2} /> you flagged yourself. That's about <b>1 in every {Math.max(2, Math.round(1 / Math.max(sum.share, 0.01)))}</b>.
-                    </p>
-                    <p className={s.hint}>Short replies like “Do it.” stay. Nothing is removed until you've looked, and anything swept can be restored.</p>
-                  </div>
-                  <div className={s.sheetFoot}>
-                    <span className={s.spacer} />
-                    <button className={s.btn} onClick={() => setView('history')}>Not now</button>
-                    <button className={s.btn} data-primary="true" onClick={() => setView('review')}>Review</button>
-                  </div>
+                  <button className={s.cellBack} onClick={() => setView('history')}><ArrowLeft size={15} />History</button>
+                  <h2 className={s.cellTitle}>Swept · {swept.length}</h2>
+                  <span className={s.barSpacer} />
+                  {swept.length > 0 && (
+                    <>
+                      <button className={s.chip} data-kind="ghost" onClick={restoreAll}><RotateCcw size={13} />Restore all</button>
+                      <button className={s.chip} data-kind="dangerText" onClick={() => setConfirmEmpty(true)}>Empty now</button>
+                    </>
+                  )}
+                </>
+              ) : (
+                <>
+                  <h3 className={s.label}>{firstDay}</h3>
+                  <span className={s.barSpacer} />
+                  {swept.length > 0 && (
+                    <button className={s.sweptLink} onClick={() => setView('cell')} aria-label={`Swept, ${swept.length}, open the holding cell`}>
+                      Swept · {swept.length}
+                    </button>
+                  )}
+                  <label className={s.searchBox}>
+                    <Search size={14} />
+                    <input placeholder="Search" value={q} onChange={e => setQ(e.target.value)} aria-label="Search transcripts" />
+                  </label>
+                  <button className={s.icon} data-tip="Sweep" data-on={sweepOpen} aria-label={`Sweep, ${sum.candidates} to review`} onClick={() => setSweepOpen(true)}>
+                    <Broom size={16} />
+                    {sum.candidates > 0 && <i className={s.dot} />}
+                  </button>
                 </>
               )}
+            </div>
 
-              {view === 'review' && (
-                <>
-                  <div className={s.sheetBody}>
-                    {ORDER.map(r => {
-                      const group = cands.filter(c => c.reason === r).sort((a, b) => b.confidence - a.confidence)
-                      if (!group.length) return null
-                      const closed = r === 'reply' && !repliesOpen
-                      return (
-                        <div key={r}>
-                          {r === 'reply'
-                            ? <button className={s.group} aria-expanded={repliesOpen} onClick={() => setRepliesOpen(o => !o)}><h3>{REASON_LABEL[r]}</h3><span>{group.length}</span><span className={s.groupNote}>{repliesOpen ? 'Hide' : 'Kept by default'}</span></button>
-                            : <div className={s.group}><h3>{REASON_LABEL[r]}</h3><span>{group.length}</span></div>}
-                          {!closed && group.map(c => (
-                            <label key={c.entry.id} className={s.cand} data-borderline={c.reason !== 'reply' && c.confidence < threshold}>
-                              <input type="checkbox" checked={selected(c)} onChange={() => toggleKeep(c.entry.id)} aria-label={`Sweep: ${textOf(c.entry) || 'empty transcript'}`} />
-                              <span>
-                                <span className={textOf(c.entry) ? s.candText : s.empty} style={{ display: 'block' }}>{textOf(c.entry) || 'Empty'}</span>
-                                <span className={s.why}>{c.why} · {appLabel(c.entry.app)} · {when(c.entry.timestamp)}</span>
-                              </span>
-                              <span className={s.conf}><span>{pct(c.confidence)}</span><span className={s.bar}><i style={{ width: pct(c.confidence) }} /></span></span>
-                            </label>
-                          ))}
-                        </div>
-                      )
-                    })}
-                  </div>
-                  <div className={s.sheetFoot}>
-                    <label className={s.thresh}>Confidence at least {pct(threshold)}
-                      <input type="range" min={0.3} max={0.95} step={0.05} value={threshold} onChange={e => setThreshold(Number(e.target.value))} />
-                    </label>
-                    <span className={s.spacer} />
-                    <button className={s.btn} onClick={() => setView('history')}>Cancel</button>
-                    <button className={s.btn} data-primary="true" disabled={!toSweep.length} onClick={sweep}>Sweep {toSweep.length}</button>
-                  </div>
-                </>
+            {view === 'cell'
+              ? <HoldingCell items={swept} byId={byId} reasons={reasonOf} now={t} onRestore={restore} />
+              : <HistoryList entries={visible} now={t} />}
+            {view === 'history' && (
+              <p className={s.more}>{live.length} transcripts · {usingRealData ? 'real history, local only' : 'sample data'}</p>
+            )}
+          </div>
+
+          <div className={s.aside}>
+            <Stats words={totalWords} />
+            <AnimatePresence>
+              {showReminder && (
+                <Reminder key="reminder" counts={leavingCounts} total={leavingToday.length}
+                  onReview={() => setView('cell')} onKeep={keepLeaving} onDismiss={dismiss} />
               )}
-            </motion.section>
-          </>
-        )}
-      </AnimatePresence>
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
 
       <AnimatePresence>
-        {sweptOpen && swept.length > 0 && (
-          <motion.aside key="swept" className={s.swept} initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 12, opacity: 0 }} transition={{ duration: .22 }} aria-label="Swept transcripts">
-            <div className={s.sweptHead}>
-              <Check size={16} /><h3>Swept {swept.length}</h3>
-              <button className={s.link} onClick={restoreAll}><RotateCcw size={14} />Restore all</button>
-              <button className={s.iconBtn} aria-label="Close" onClick={() => setSweptOpen(false)}><X size={14} /></button>
-            </div>
-            <div className={s.sweptList}>
-              <AnimatePresence initial={false}>
-                {sweptEntries.map(e => (
-                  <motion.div key={e.id} className={s.sweptRow} layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: 8 }}>
-                    <span className={textOf(e) ? s.candText : s.empty}>{textOf(e) || 'Empty'} <span className={s.why} style={{ display: 'inline' }}>· {appLabel(e.app)}</span></span>
-                    <button className={s.link} onClick={() => restore(e.id)}><Undo2 size={14} />Restore</button>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
-          </motion.aside>
+        {sweepOpen && (
+          <SweepDialog key="sweep" cands={cands} sum={sum} selected={selected} setMany={setMany}
+            onSweep={sweep} onClose={() => setSweepOpen(false)} />
+        )}
+        {confirmEmpty && (
+          <Confirm key="confirm" title="Empty the holding cell?" body={`${swept.length} swept transcripts will be deleted for good. This cannot be undone.`}
+            action="Yes, delete them" onConfirm={emptyNow} onClose={() => setConfirmEmpty(false)} />
         )}
       </AnimatePresence>
     </div>
   )
-}
-
-// counts settle in sequence, not at once
-function Count({ n, i }: { n: number; i: number }) {
-  return <motion.b initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .12 + i * .14, duration: .3 }}>{n}</motion.b>
 }

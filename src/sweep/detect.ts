@@ -54,13 +54,14 @@ export function classify(e: Entry): Candidate | null {
 
   // Empty (incl. Flow's own failure statuses)
   if (text.length === 0 || FAILURE_STATUSES.has(e.status ?? '')) {
-    const long = (e.duration ?? 0) > 30
+    // A long recording that came back empty probably held speech. Flow can already retry a
+    // transcript, so these are offered for retry, not swept by default.
+    if ((e.duration ?? 0) > 30) {
+      return { entry: e, reason: 'retry', confidence: 0.3, why: `${Math.round(e.duration ?? 0)} s recorded, no text came back` }
+    }
     return {
-      entry: e, reason: 'empty',
-      confidence: long ? 0.9 : 0.98,
-      why: long
-        ? `${Math.round(e.duration ?? 0)} s recorded, no text came back`
-        : e.status && FAILURE_STATUSES.has(e.status) ? `Flow marked it ${e.status.replace('_', ' ')}` : 'No text',
+      entry: e, reason: 'empty', confidence: 0.98,
+      why: e.status && FAILURE_STATUSES.has(e.status) ? `Flow marked it ${e.status.replace('_', ' ')}` : 'No text',
     }
   }
 
@@ -107,10 +108,10 @@ export function detect(entries: Entry[]): Candidate[] {
 
 export function summarize(entries: Entry[], cands: Candidate[]): Summary {
   const count = (r: Reason) => cands.filter(c => c.reason === r).length
-  const sweepable = cands.filter(c => c.reason !== 'reply')
+  const sweepable = cands.filter(c => c.reason !== 'reply' && c.reason !== 'retry')
   return {
     total: entries.length,
-    empty: count('empty'), cutoff: count('cutoff'), flagged: count('flagged'), reply: count('reply'),
+    empty: count('empty'), cutoff: count('cutoff'), flagged: count('flagged'), reply: count('reply'), retry: count('retry'),
     candidates: sweepable.length,
     share: entries.length ? sweepable.length / entries.length : 0,
   }

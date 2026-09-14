@@ -98,3 +98,14 @@ screenshot, file not kept): right column, directly under the stats / Voice Profi
 
 **Also from the Flow captures:** rename "Flagged by you" (Flow already has a Flag action); long empty
 recordings (>30 s) get a **Retry first** section using Flow's existing "Retry transcript".
+
+**Where the holding cell lives (decided 14 September):** inside History, not the sidebar.
+- Entry points: a **"Swept · N"** control in the sticky History header beside search and the broom (only
+  when N > 0), and the reminder card's **Review**.
+- It replaces the History list in place, like a filter. Day groups by the day rows LEAVE, not the day
+  they were dictated: "LEAVES FOR GOOD TONIGHT", "LEAVES SEPTEMBER 20". Same header + white card as History.
+- Rows match History; hover shows **Restore** instead of copy / flag.
+- Top: back to History, **Restore all**, **Empty now** (coral, the only destructive control).
+- Empty state: one line, "Nothing swept. Anything you sweep stays here for 7 days."
+- Why not the sidebar: the sidebar lists features, the holding cell is a temporary state of History,
+  and restoring feels safe when the rows sit beside where they came from.

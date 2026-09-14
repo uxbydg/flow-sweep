@@ -16,7 +16,7 @@ export interface Entry {
 }
 
 // 'reply' is shown in Review but never selected by default: short, and finished.
-export type Reason = 'empty' | 'cutoff' | 'flagged' | 'reply'
+export type Reason = 'empty' | 'retry' | 'cutoff' | 'flagged' | 'reply'
 
 export interface Candidate {
   entry: Entry
@@ -31,6 +31,12 @@ export interface Summary {
   cutoff: number
   flagged: number
   reply: number
+  retry: number
   candidates: number
   share: number
+}
+
+export interface SweptItem {
+  id: string
+  sweptAt: number
 }
