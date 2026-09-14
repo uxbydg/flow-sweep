@@ -25,3 +25,6 @@ dist-ssr
 
 # private data: Daniel's real Flow history, never committed
 src/data/history.private.json
+
+# Flow UI reference captures: carry personal stats and history, never committed
+ref/

@@ -84,8 +84,8 @@ Never cut: review before sweep, the Swept place with restore, real data locally.
 - **Section-level select** on every Review header (take or leave a whole section). Short replies still
   start unselected.
 
-**A "leaving today" reminder on the home screen** (Daniel's idea, placement from his screenshot
-`ref/daniel-reminder-placement.png`): right column, directly under the stats / Voice Profile card.
+**A "leaving today" reminder on the home screen** (Daniel's idea; he marked the spot on a
+screenshot, file not kept): right column, directly under the stats / Voice Profile card.
 - Shows ONLY on a day when swept rows reach day 7. Never otherwise; a permanent card is noise.
 - Names the sections and counts: "12 swept transcripts leave for good tonight: 8 Empty, 3 Cut off,
   1 you said to drop." Grouped by the day they were swept if more than one batch expires.
