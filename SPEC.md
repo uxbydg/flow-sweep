@@ -73,3 +73,28 @@ text did not come back.
 ## Cut list, in order
 1. Threshold control → fixed at 0.60. 2. Motion → CSS transitions. 3. Flag phrases → static list.
 Never cut: review before sweep, the Swept place with restore, real data locally.
+
+## Decided 14 September (Daniel)
+
+**Swept is a 7-day holding cell, not a delete.**
+- Swept rows leave History at once, stay restorable for 7 days, then are permanently deleted.
+- **Empty now** in the holding cell, for anyone who wants them gone today.
+- **Respects Flow's auto-delete setting.** If transcripts auto-delete sooner, swept rows go on that
+  schedule. The sweep never keeps words longer than the person already told Flow to.
+- **Section-level select** on every Review header (take or leave a whole section). Short replies still
+  start unselected.
+
+**A "leaving today" reminder on the home screen** (Daniel's idea, placement from his screenshot
+`ref/daniel-reminder-placement.png`): right column, directly under the stats / Voice Profile card.
+- Shows ONLY on a day when swept rows reach day 7. Never otherwise; a permanent card is noise.
+- Names the sections and counts: "12 swept transcripts leave for good tonight: 8 Empty, 3 Cut off,
+  1 you said to drop." Grouped by the day they were swept if more than one batch expires.
+- Two actions: **Review** (opens the holding cell) and **Keep them** (restores all of today's batch).
+  Dismissable for the day.
+- Styling: Flow's own card (same surface, radius and type as the stats card). **Not a red box.** Flow
+  spends its coral only on destructive actions ("Delete transcript", "Yes, delete it"); a red card on
+  the home screen every week would read as an error. The coral goes on the one thing that is
+  destructive: the "tonight" deadline text or a small dot.
+
+**Also from the Flow captures:** rename "Flagged by you" (Flow already has a Flag action); long empty
+recordings (>30 s) get a **Retry first** section using Flow's existing "Retry transcript".
