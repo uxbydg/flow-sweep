@@ -32,6 +32,9 @@
 .group { margin: 14px 0 6px; display: flex; align-items: baseline; gap: 10px;
   h3 { margin: 0; font-size: 13px; font-weight: 600; letter-spacing: .02em; text-transform: uppercase; color: var(--ink-2); }
   span { font-size: 12px; color: var(--mut); } }
+button.group { width: 100%; background: none; border: 0; padding: 0; font: inherit; cursor: pointer; text-align: left; border-radius: 4px;
+  &:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; } }
+.groupNote { margin-left: auto; }
 .cand { display: grid; grid-template-columns: 22px 1fr auto; gap: 12px; align-items: start; padding: 10px 12px; border-radius: var(--r); cursor: pointer;
   &:hover { background: var(--hover); }
   input { margin: 3px 0 0; accent-color: var(--accent); width: 16px; height: 16px; }

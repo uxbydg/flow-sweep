@@ -4,7 +4,7 @@ import type { Entry } from '../src/data/types.ts'
 const entries: Entry[] = JSON.parse(readFileSync(new URL('../src/data/history.private.json', import.meta.url), 'utf8'))
 const cands = detect(entries)
 const s = summarize(entries, cands)
-console.log(`total ${s.total}  empty ${s.empty}  short ${s.short}  flagged ${s.flagged}  candidates ${s.candidates}  share ${(s.share*100).toFixed(1)}%`)
+console.log(`total ${s.total}  empty ${s.empty}  cutoff ${s.cutoff}  reply ${s.reply}  flagged ${s.flagged}  candidates ${s.candidates}  share ${(s.share*100).toFixed(1)}%`)
 const above = cands.filter(c => c.confidence >= DEFAULT_THRESHOLD).length
 console.log(`preselected at ${DEFAULT_THRESHOLD}: ${above}   borderline: ${cands.length - above}`)
 console.log('--- borderline rows (shown, not selected) ---')

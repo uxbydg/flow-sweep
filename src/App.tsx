@@ -8,8 +8,9 @@ import { when, secs, pct } from './format.ts'
 import { Search, Check, Undo2, X, RotateCcw, Broom } from './icons.ts'
 
 type View = 'history' | 'summary' | 'review'
-const REASON_LABEL: Record<Reason, string> = { empty: 'Empty', short: 'Under 20 characters', flagged: 'Flagged by you' }
-const ORDER: Reason[] = ['empty', 'short', 'flagged']
+const REASON_LABEL: Record<Reason, string> = { empty: 'Empty', cutoff: 'Cut off', flagged: 'Flagged by you', reply: 'Short replies' }
+// Replies go last and start closed: they are finished thoughts, listed so the choice stays yours.
+const ORDER: Reason[] = ['empty', 'cutoff', 'flagged', 'reply']
 
 export default function App() {
   const [view, setView] = useState<View>('history')
@@ -18,6 +19,7 @@ export default function App() {
   const [kept, setKept] = useState<Set<string>>(new Set())
   const [swept, setSwept] = useState<string[]>([])
   const [sweptOpen, setSweptOpen] = useState(false)
+  const [repliesOpen, setRepliesOpen] = useState(false)
 
   const live = useMemo(() => allEntries.filter(e => !swept.includes(e.id)), [swept])
   const cands = useMemo(() => detect(live), [live])
@@ -86,10 +88,10 @@ export default function App() {
                 <>
                   <div className={s.sheetBody}>
                     <p className={s.lead}>
-                      You have <Count n={sum.empty} i={0} /> empty transcripts, <Count n={sum.short} i={1} /> under 20 characters,
+                      You have <Count n={sum.empty} i={0} /> empty transcripts, <Count n={sum.cutoff} i={1} /> that cut off mid-thought,
                       and <Count n={sum.flagged} i={2} /> you flagged yourself. That's about <b>1 in every {Math.max(2, Math.round(1 / Math.max(sum.share, 0.01)))}</b>.
                     </p>
-                    <p className={s.hint}>Nothing is removed until you've looked. Anything swept can be restored.</p>
+                    <p className={s.hint}>Short replies like “Do it.” stay. Nothing is removed until you've looked, and anything swept can be restored.</p>
                   </div>
                   <div className={s.sheetFoot}>
                     <span className={s.spacer} />
@@ -105,11 +107,14 @@ export default function App() {
                     {ORDER.map(r => {
                       const group = cands.filter(c => c.reason === r).sort((a, b) => b.confidence - a.confidence)
                       if (!group.length) return null
+                      const closed = r === 'reply' && !repliesOpen
                       return (
                         <div key={r}>
-                          <div className={s.group}><h3>{REASON_LABEL[r]}</h3><span>{group.length}</span></div>
-                          {group.map(c => (
-                            <label key={c.entry.id} className={s.cand} data-borderline={c.confidence < threshold}>
+                          {r === 'reply'
+                            ? <button className={s.group} aria-expanded={repliesOpen} onClick={() => setRepliesOpen(o => !o)}><h3>{REASON_LABEL[r]}</h3><span>{group.length}</span><span className={s.groupNote}>{repliesOpen ? 'Hide' : 'Kept by default'}</span></button>
+                            : <div className={s.group}><h3>{REASON_LABEL[r]}</h3><span>{group.length}</span></div>}
+                          {!closed && group.map(c => (
+                            <label key={c.entry.id} className={s.cand} data-borderline={c.reason !== 'reply' && c.confidence < threshold}>
                               <input type="checkbox" checked={selected(c)} onChange={() => toggleKeep(c.entry.id)} aria-label={`Sweep: ${textOf(c.entry) || 'empty transcript'}`} />
                               <span>
                                 <span className={textOf(c.entry) ? s.candText : s.empty} style={{ display: 'block' }}>{textOf(c.entry) || 'Empty'}</span>

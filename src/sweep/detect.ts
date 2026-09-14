@@ -10,16 +10,22 @@ const FLAG_PHRASES = [
   'disregard', 'oops',
 ]
 
-// Context decides what an accident is. A three-character entry into Messages is a text;
-// into Terminal it is a slip.
-const APP_WEIGHT: Record<string, number> = {
-  'com.apple.Terminal': 1.0,
-  'com.google.Chrome': 0.85,
-  'com.electron.wispr-flow': 0.8,
-  'com.apple.Notes': 0.7,
-  'com.apple.MobileSMS': 0.5,
-}
-const UNKNOWN_APP_WEIGHT = 0.85
+// Length does not decide what an accident is; whether the thought finished does.
+// In the real history, "Do it." and "Run it." into Claude Code are the most deliberate entries
+// there are, while "Watch the" and "Don't d" are the same hotkey released mid-sentence.
+const SHORT = 20
+
+// A sentence that stops on one of these did not finish.
+const DANGLING = new Set([
+  'the', 'a', 'an', 'to', 'of', 'and', 'but', 'or', 'if', 'for', 'with', 'in', 'at', 'by',
+  'from', 'my', 'your', 'our', 'we', "i'm", 'is', 'are', 'was', 'be', 'because', 'than',
+])
+
+// Short words that stand on their own, so a two-letter ending is not automatically broken.
+const WHOLE_SHORT = new Set(['it', 'go', 'no', 'ok', 'me', 'up', 'on', 'do', 'hi', 'yes', 'now', 'so', 'yo', 'ya', 'oh'])
+
+// People text in fragments; a missing full stop in Messages is weaker evidence.
+const LOOSE_APPS = new Set(['com.apple.MobileSMS'])
 
 export function textOf(e: Entry): string {
   return (e.editedText || e.formattedText || e.asrText || '').trim()
@@ -41,11 +47,10 @@ export function appLabel(app: string | null): string {
 }
 
 const PUNCT_ONLY = /^[\p{P}\p{S}\s]+$/u
+const ENDS_FINISHED = /[.!?]["”’')\]]*$/u
 
 export function classify(e: Entry): Candidate | null {
   const text = textOf(e)
-  const app = e.app ?? ''
-  const w = APP_WEIGHT[app] ?? UNKNOWN_APP_WEIGHT
 
   // Empty (incl. Flow's own failure statuses)
   if (text.length === 0 || FAILURE_STATUSES.has(e.status ?? '')) {
@@ -68,20 +73,32 @@ export function classify(e: Entry): Candidate | null {
     return { entry: e, reason: 'flagged', confidence: 0.7, why: `You said “${hit}”` }
   }
 
-  // Short
-  if (text.length < 20) {
-    if (PUNCT_ONLY.test(text)) {
-      return { entry: e, reason: 'short', confidence: 0.97, why: 'Punctuation only' }
-    }
-    const base = text.length <= 3 ? 0.9 : text.length <= 9 ? 0.75 : 0.55
-    const conf = Math.round(base * w * 100) / 100
-    const into = appLabel(e.app)
-    return {
-      entry: e, reason: 'short', confidence: conf,
-      why: `${text.length} characters into ${into}`,
-    }
+  if (text.length >= SHORT) return null
+
+  if (PUNCT_ONLY.test(text)) {
+    return { entry: e, reason: 'cutoff', confidence: 0.97, why: 'Punctuation only' }
   }
-  return null
+
+  const words = lower.replace(/[^\p{L}\p{N}'\s-]/gu, ' ').split(/\s+/).filter(Boolean)
+  const last = words[words.length - 1] ?? ''
+  const finished = ENDS_FINISHED.test(text)
+
+  // Ends like a sentence and not on a dangling word: a short reply, left alone by default.
+  if (finished && !DANGLING.has(last)) {
+    return { entry: e, reason: 'reply', confidence: 0.2, why: 'Short, but a finished thought' }
+  }
+
+  const loose = LOOSE_APPS.has(e.app ?? '') ? 0.9 : 1
+  const cut = (confidence: number, why: string): Candidate =>
+    ({ entry: e, reason: 'cutoff', confidence: Math.round(confidence * loose * 100) / 100, why })
+
+  if (/-\p{L}?$/u.test(last)) return cut(0.92, 'Stops mid-word')
+  if (text.endsWith(',')) return cut(0.85, 'Stops on a comma')
+  if (DANGLING.has(last)) return cut(0.9, `Stops on “${last}”`)
+  if (words.length > 1 && last.length <= 2 && !WHOLE_SHORT.has(last) && !/\d/.test(last)) return cut(0.9, 'Stops mid-word')
+  if (words.length === 1 && last.length <= 3 && !WHOLE_SHORT.has(last)) return cut(0.85, 'One fragment')
+  // No ending, but nothing visibly broken ("Excel", "Run it", "right now"): shown, not selected.
+  return cut(0.5, 'No ending, may be complete')
 }
 
 export function detect(entries: Entry[]): Candidate[] {
@@ -90,10 +107,11 @@ export function detect(entries: Entry[]): Candidate[] {
 
 export function summarize(entries: Entry[], cands: Candidate[]): Summary {
   const count = (r: Reason) => cands.filter(c => c.reason === r).length
+  const sweepable = cands.filter(c => c.reason !== 'reply')
   return {
     total: entries.length,
-    empty: count('empty'), short: count('short'), flagged: count('flagged'),
-    candidates: cands.length,
-    share: entries.length ? cands.length / entries.length : 0,
+    empty: count('empty'), cutoff: count('cutoff'), flagged: count('flagged'), reply: count('reply'),
+    candidates: sweepable.length,
+    share: entries.length ? sweepable.length / entries.length : 0,
   }
 }

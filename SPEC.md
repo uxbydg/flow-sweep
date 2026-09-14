@@ -4,38 +4,37 @@ A concept for Wispr Flow's history view: find the entries that are almost certai
 show them in one place with the reason and the confidence, sweep them in one motion, and keep
 them somewhere you can get them back from. Built against one real user's 874 entries.
 
-## The three categories, from the data
+## The four sections, from the data
 
-| Reason | Rule | In the real history |
-|---|---|---|
-| **Empty** | no text after trim, or Flow's own status is `dismissed` / `no_audio` / `empty` | 100 of 874 |
-| **Short** | under 20 characters | 81 |
-| **Flagged** | the entry names its own fate ("clean up", "never mind", "scratch that", "not what I", "ignore that", "delete that", "oops") | ~15 |
+| Section | Rule | Real history (874) | Selected by default |
+|---|---|---|---|
+| **Empty** | no text after trim, or Flow's own status is `dismissed` / `no_audio` / `empty` | 100 | yes |
+| **Cut off** | under 20 characters and the thought did not finish: punctuation only, stops on a comma, on a dangling word ("the", "to", "is"), or mid-word ("pa", "re-b") | 40 (24 selected, 16 shown as borderline) | when confidence ≥ 0.60 |
+| **Flagged by you** | the entry names its own fate ("never mind", "scratch that", "oops"...) at its start, or anywhere in an entry under 40 chars | 1 | yes |
+| **Short replies** | under 20 characters and finished: ends in . ! or ? and not on a dangling word | 43 | **never**; listed last, collapsed |
 
 Dropped: near-duplicate retries (1 case in 874). Not built: "not words" (none found).
 
-## Confidence is app-weighted
+## Completeness decides, not the app (revised 14 September)
 
-Length alone cannot decide. `Hi.` into Messages is a real text; `Hi.` into Terminal is not.
-Each candidate carries a confidence 0–1:
+The first version weighted confidence by target app and treated Terminal as the most accident-prone.
+Daniel's real Short list proved it inverted: "Do it." ×13 and "Run it." ×7 into Claude Code are the
+most deliberate entries in the history (Flow's own Insights names his catchphrase as "Can we run
+the agent?"), while "Watch the", "Don't d" and "The About Me pa" are the hotkey released mid-sentence.
+**Whether the thought finished separates them; length and app do not.** The app survives as one small
+adjustment: cut-off confidence × 0.9 in Messages, where people text in fragments.
 
-- Empty: 0.98. If the recording ran over 30 s with no text, 0.90 (something else happened; still
-  sweepable, but say so).
-- Punctuation-only (`.` `?` `!!`): 0.97 in any app.
-- Short: base 0.90 for 1–3 chars, 0.75 for 4–9, 0.55 for 10–19, then multiplied by an app weight:
-  Terminal 1.0, Chrome 0.85, unknown 0.85, Flow itself 0.8, Notes 0.7, Messages 0.5.
-- Flagged: 0.80.
-
-One reason per row (priority Empty, Flagged, Short); confidence is the highest that applies.
-**Default threshold 0.60.** Rows at or above it are preselected. Rows below it are shown, marked
-borderline, and NOT selected. The threshold is a control if time allows.
+Confidence: Empty 0.98 (0.90 if over 30 s recorded). Punctuation only 0.97. Mid-word 0.90–0.92,
+dangling word 0.90, trailing comma 0.85, single fragment ≤3 chars 0.85. No ending but nothing visibly
+broken ("Excel", "Run it", "right now") 0.50: shown, not selected. Flagged 0.70. Short reply 0.20.
+Result: 141 candidates, **125 selected, about 1 in 6** (was 145 selected, 1 in 5, before the revision).
 
 ## The four states
 
 1. **History.** Flow-style list: app, time, first line, duration. Search. A **Sweep** affordance
    (broom) beside search. Nothing else changes.
 2. **Summary.** One sentence in counts before anything happens: "You have 100 empty transcripts,
-   81 under 20 characters, and about a dozen you flagged yourself. That's about 1 in 5." Two
+   40 that cut off mid-thought, and 1 you flagged yourself. That's about 1 in every 6." Two
    actions: Review, Not now.
 3. **Review.** Candidates grouped by reason. Each row: reason chip, confidence, app, time, the text.
    Everything above threshold is selected. One tap to keep. Nothing leaves on detection.

@@ -15,7 +15,8 @@ export interface Entry {
   contentObservationEndReason: string | null
 }
 
-export type Reason = 'empty' | 'short' | 'flagged'
+// 'reply' is shown in Review but never selected by default: short, and finished.
+export type Reason = 'empty' | 'cutoff' | 'flagged' | 'reply'
 
 export interface Candidate {
   entry: Entry
@@ -27,8 +28,9 @@ export interface Candidate {
 export interface Summary {
   total: number
   empty: number
-  short: number
+  cutoff: number
   flagged: number
+  reply: number
   candidates: number
   share: number
 }
