@@ -30,7 +30,6 @@ export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose, onS
   const decidedOn = decided.filter(selected).length
   const doubtOn = doubtful.filter(selected).length
   const going = decidedOn + doubtOn
-  const found = decided.filter(c => c.reason !== 'reply').length
   const sections = ORDER.filter(r => r !== 'retry').map(r => ({ r, rows: decided.filter(c => c.reason === r).sort((a, b) => b.confidence - a.confidence) })).filter(g => g.rows.length)
   const shown = sections.find(g => g.r === open)
   const shownOn = shown ? shown.rows.filter(selected).length : 0
@@ -39,12 +38,8 @@ export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose, onS
     <section className={s.sweepCard} aria-labelledby="sweepTitle">
       <div className={s.sweepHead}>
         <span className={s.sweepMark}><Broom size={12} strokeWidth={2.25} /></span>
-        <h3 id="sweepTitle" className={s.sweepTitle}>
-          <b>{found}</b> transcripts look like accidents.
-          {/* the finding never moves; what the person adds or removes is said as a second sentence, so the button's number is always accounted for */}
-          {going > found && <span className={s.sweepDelta}> You added {going - found}.</span>}
-          {going < found && <span className={s.sweepDelta}> You kept {found - going}.</span>}
-        </h3>
+        {/* one live number, the same one the button carries; the tabs and the question show how it is made */}
+        <h3 id="sweepTitle" className={s.sweepTitle}>Flow will sweep <b>{going}</b> transcripts.</h3>
       </div>
 
       {/* Flow's tab strip: the breakdown, and each tab opens its own rows so every one can be seen and kept */}
