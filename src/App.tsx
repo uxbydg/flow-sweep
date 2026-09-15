@@ -14,7 +14,7 @@ import { Titlebar, Sidebar, Banner, Stats } from './components/Chrome.tsx'
 import { HistoryList } from './components/HistoryList.tsx'
 import { HoldingCell } from './components/HoldingCell.tsx'
 import { Reminder } from './components/Reminder.tsx'
-import { SweepView } from './components/SweepView.tsx'
+import { SweepCard } from './components/SweepCard.tsx'
 import { Confirm } from './components/Dialogs.tsx'
 import { Search, Broom, ArrowLeft, RotateCcw } from './icons.ts'
 
@@ -47,7 +47,8 @@ export default function App() {
     }
     return items
   })
-  const [view, setView] = useState<'history' | 'cell' | 'sweep'>('history')
+  const [view, setView] = useState<'history' | 'cell'>('history')
+  const [sweepOpen, setSweepOpen] = useState(false)
   const [q, setQ] = useState('')
   const [searchOpen, setSearchOpen] = useState(false)
   const [confirmEmpty, setConfirmEmpty] = useState(false)
@@ -81,8 +82,8 @@ export default function App() {
   const sweep = () => {
     const chosen = cands.filter(selected).map(c => ({ id: c.entry.id, sweptAt: t }))
     setChoices(new Map())
-    setView('history')
-    // History mounts with the rows still in it, then they lift out with the stagger.
+    setSweepOpen(false)
+    // The card folds first, then the rows lift out of the list beneath where it was.
     window.setTimeout(() => setSwept(prev => [...chosen, ...prev]), 80)
   }
   const sweepOne = (id: string) => setSwept(prev => [{ id, sweptAt: t }, ...prev])
@@ -110,9 +111,12 @@ export default function App() {
   const dismiss = () => { setDismissed(today); saveDismissed(today) }
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && view !== 'history' && !confirmEmpty) setView('history') }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape' || confirmEmpty) return
+      if (sweepOpen) setSweepOpen(false); else if (view !== 'history') setView('history')
+    }
     window.addEventListener('keydown', onKey); return () => window.removeEventListener('keydown', onKey)
-  }, [view, confirmEmpty])
+  }, [view, sweepOpen, confirmEmpty])
 
   const firstDay = visible[0] ? dayLabel(toDate(visible[0].timestamp).getTime(), t) : 'Today'
 
@@ -128,12 +132,7 @@ export default function App() {
             <Banner />
 
             <div className={s.bar}>
-              {view === 'sweep' ? (
-                <>
-                  <button className={s.cellBack} onClick={() => setView('history')}><ArrowLeft size={15} />History</button>
-                  <h2 className={s.cellTitle}>Sweep</h2>
-                </>
-              ) : view === 'cell' ? (
+              {view === 'cell' ? (
                 <>
                   <button className={s.cellBack} onClick={() => setView('history')}><ArrowLeft size={15} />History</button>
                   <h2 className={s.cellTitle}>Swept · {swept.length}</h2>
@@ -165,7 +164,7 @@ export default function App() {
                     // Flow's bar is bare glyphs: the field appears only once search is asked for.
                     <button className={s.icon} data-tip="Search" aria-label="Search transcripts" onClick={() => setSearchOpen(true)}><Search size={16} /></button>
                   )}
-                  <button className={s.icon} data-tip="Sweep" aria-label={`Sweep, ${sum.candidates} to review`} onClick={() => setView('sweep')}>
+                  <button className={s.icon} data-tip="Sweep" data-on={sweepOpen} aria-expanded={sweepOpen} aria-controls="sweepCard" aria-label={`Sweep, ${sum.candidates} to review`} onClick={() => setSweepOpen(o => !o)}>
                     <Broom size={16} />
                     {sum.candidates > 0 && <i className={s.dot} />}
                   </button>
@@ -173,11 +172,12 @@ export default function App() {
               )}
             </div>
 
-            {view === 'sweep'
-              ? <SweepView cands={cands} sum={sum} selected={selected} setMany={setMany} onSweep={sweep} onClose={() => setView('history')} />
-              : view === 'cell'
-                ? <HoldingCell items={swept} byId={byId} reasons={reasonOf} now={t} onRestore={restore} />
-                : <HistoryList entries={visible} now={t} onSweepOne={sweepOne} />}
+            {view === 'history' && sweepOpen && (
+              <SweepCard cands={cands} sum={sum} selected={selected} setMany={setMany} onSweep={sweep} onClose={() => setSweepOpen(false)} />
+            )}
+            {view === 'cell'
+              ? <HoldingCell items={swept} byId={byId} reasons={reasonOf} now={t} onRestore={restore} />
+              : <HistoryList entries={visible} now={t} onSweepOne={sweepOne} />}
             {view === 'history' && (
               <p className={s.more}>{live.length} transcripts · {usingRealData ? 'real history, local only' : 'sample data'}</p>
             )}

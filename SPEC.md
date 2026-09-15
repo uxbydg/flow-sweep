@@ -135,3 +135,21 @@ So Sweep is a view inside History, like the holding cell: the summary sentence, 
 visible at a time, select-all for the section, and a sticky footer with the only two actions:
 **Not now** and **Sweep N**. The two-step Summary → Review is gone. The modal survives only for
 Empty now.
+
+## The sweep is a card the broom unfolds (decided 14 September, late, after the debate)
+
+Daniel's question: does sweep deserve real estate? Debated card vs icon. Verdict: **the icon** beside
+search is the resting state (Flow puts list operations there: search, sort, refresh, plus), with the
+dot as the only standing signal. Flow's banners teach features; none does maintenance, and a permanent
+chore card above the person's own words is noise. The card is what the broom OPENS: it unfolds in
+place above the day list, and folds away on Sweep or Not now. No pane, no modal.
+
+Two tiers, readable in 30 seconds:
+1. **What Flow decided.** "Flow will sweep 106 transcripts that are certainly accidents." Empty,
+   cut off at ≥ 0.90 (punctuation only, mid-word), and the ones the person flagged. Counted, not
+   listed; a "Show" for the sceptic.
+2. **The one question.** "Are these accidents too?" The cut-offs under 0.90 as toggle chips, least
+   sure first. They are all under 20 characters, so chips scan where rows do not. Filled teal = goes,
+   outline = stays; the classifier's default fills the ones at 0.60 and above.
+Then one line for Retry (long empties) and one for short replies, and two buttons: Not now, Sweep N.
+The rows lift out of the list beneath the card. The tab-strip view and the modal are both gone.
