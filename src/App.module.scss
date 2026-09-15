@@ -102,9 +102,9 @@
 .actions { display: flex; gap: 2px; opacity: 0; transition: opacity .12s; }
 // Flow's row menu: white, hairline, soft shadow, hangs from the three-dot and past the card edge
 .menuAnchor { position: relative; display: inline-flex; }
-.menu { position: absolute; top: calc(100% + 4px); right: 0; z-index: 7; min-width: 172px; padding: 4px; background: #fff; border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow-pop); }
-.menuItem { display: flex; align-items: center; gap: 9px; width: 100%; border: 0; background: transparent; text-align: left; padding: 6px 8px; border-radius: var(--r-sm); font-size: 12.5px; color: var(--ink); cursor: pointer; white-space: nowrap;
-  svg { color: var(--ink-2); flex: none; }
+.menu { position: absolute; top: calc(100% + 4px); right: 0; z-index: 7; min-width: 210px; padding: 6px; background: #fff; border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow-pop); }
+.menuItem { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; background: transparent; text-align: left; padding: 7px 8px; border-radius: var(--r-sm); font-size: 13px; color: var(--ink); cursor: pointer; white-space: nowrap;
+  svg { color: var(--ink); flex: none; }
   &:hover { background: var(--hover); }
   &[data-kind="danger"] { color: var(--coral-ink); svg { color: var(--coral); } }
   &[disabled] { cursor: default; &:hover { background: transparent; } } }

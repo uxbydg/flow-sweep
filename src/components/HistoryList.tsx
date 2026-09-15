@@ -4,7 +4,7 @@ import s from '../App.module.scss'
 import type { Entry } from '../data/types.ts'
 import { textOf } from '../sweep/detect.ts'
 import { toDate, dayKey, dayLabel, flowTime, mmss } from '../format.ts'
-import { Play, Copy, Flag, EllipsisVertical, Undo2, RefreshCw, Broom, Trash2, FileAudio } from '../icons.ts'
+import { Play, Copy, Flag, EllipsisVertical, Undo2, RotateCw, Broom, Trash, FileMusic } from '../icons.ts'
 
 const PAGE = 120
 
@@ -97,11 +97,11 @@ function Row({ e, i, onSweep, onRetry, retrying }: { e: Entry; i: number; onSwee
             // Flow's own menu, with one line added. Sweep sits above Delete: the reversible
             // option before the irreversible one. Only Sweep is live in this concept.
             <div className={s.menu} role="menu">
-              <button className={s.menuItem} role="menuitem" disabled><Undo2 size={13} />Undo AI edit</button>
-              <button className={s.menuItem} role="menuitem" onClick={() => { setMenu(false); onRetry() }}><RefreshCw size={13} />Retry transcript</button>
-              <button className={s.menuItem} role="menuitem" onClick={() => { setMenu(false); onSweep() }}><Broom size={13} />Sweep transcript</button>
-              <button className={s.menuItem} role="menuitem" data-kind="danger" disabled><Trash2 size={13} />Delete transcript</button>
-              <button className={s.menuItem} role="menuitem" disabled><FileAudio size={13} />Extract audio</button>
+              <button className={s.menuItem} role="menuitem" disabled><Undo2 size={14} />Undo AI edit</button>
+              <button className={s.menuItem} role="menuitem" onClick={() => { setMenu(false); onRetry() }}><RotateCw size={14} />Retry transcript</button>
+              <button className={s.menuItem} role="menuitem" onClick={() => { setMenu(false); onSweep() }}><Broom size={14} />Sweep transcript</button>
+              <button className={s.menuItem} role="menuitem" data-kind="danger" disabled><Trash size={14} fill="currentColor" />Delete transcript</button>
+              <button className={s.menuItem} role="menuitem" disabled><FileMusic size={14} />Extract audio</button>
             </div>
           )}
         </span>
