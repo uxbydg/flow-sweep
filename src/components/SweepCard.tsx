@@ -38,7 +38,7 @@ export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose, onS
     <section className={s.sweepCard} aria-labelledby="sweepTitle">
       <div className={s.sweepHead}>
         <span className={s.sweepMark}><Broom size={12} strokeWidth={2.25} /></span>
-        <h3 id="sweepTitle" className={s.sweepTitle}><b>{decided.length}</b> transcripts look like accidents.</h3>
+        <h3 id="sweepTitle" className={s.sweepTitle}><b>{decided.filter(c => c.reason !== 'reply').length}</b> transcripts look like accidents.</h3>
       </div>
 
       {/* Flow's tab strip: the breakdown, and each tab opens its own rows so every one can be seen and kept */}
