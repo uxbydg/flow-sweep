@@ -4,6 +4,7 @@ import s from '../App.module.scss'
 import type { Entry } from '../data/types.ts'
 import { textOf } from '../sweep/detect.ts'
 import { toDate, dayKey, dayLabel, flowTime, mmss } from '../format.ts'
+import { usePageVisible } from '../usePageVisible.ts'
 import { Play, Copy, Flag, EllipsisVertical, Undo2, RotateCw, Broom, Trash, FileMusic } from '../icons.ts'
 
 const PAGE = 120
@@ -12,6 +13,7 @@ interface Props { entries: Entry[]; now: number; onSweepOne: (id: string) => voi
 
 // Flow's history: a card per day, time on the left, empty transcripts as blank rows.
 export function HistoryList({ entries, now, onSweepOne, onRetry, retrying }: Props) {
+  const visible = usePageVisible()
   const [limit, setLimit] = useState(PAGE)
   const sentinel = useRef<HTMLDivElement>(null)
 
@@ -40,11 +42,11 @@ export function HistoryList({ entries, now, onSweepOne, onRetry, retrying }: Pro
       <AnimatePresence initial={false}>
         {days.map(day => (
           <motion.section key={day.key} aria-label={dayLabel(day.t, now)}
-            exit={{ opacity: 0, transition: { duration: .2 } }}>
+            exit={visible ? { opacity: 0, transition: { duration: .2 } } : undefined}>
             {day !== days[0] && <h3 className={`${s.label} ${s.dayLabel}`}>{dayLabel(day.t, now)}</h3>}
             <div className={s.day}>
               <AnimatePresence initial={false} mode="popLayout">
-                {day.rows.map((e, i) => <Row key={e.id} e={e} i={i} onSweep={() => onSweepOne(e.id)} onRetry={() => onRetry(e.id)} retrying={retrying.has(e.id)} />)}
+                {day.rows.map((e, i) => <Row key={e.id} e={e} i={i} onSweep={() => onSweepOne(e.id)} onRetry={() => onRetry(e.id)} retrying={retrying.has(e.id)} animate={visible} />)}
               </AnimatePresence>
             </div>
           </motion.section>
@@ -55,7 +57,7 @@ export function HistoryList({ entries, now, onSweepOne, onRetry, retrying }: Pro
   )
 }
 
-function Row({ e, i, onSweep, onRetry, retrying }: { e: Entry; i: number; onSweep: () => void; onRetry: () => void; retrying: boolean }) {
+function Row({ e, i, onSweep, onRetry, retrying, animate }: { e: Entry; i: number; onSweep: () => void; onRetry: () => void; retrying: boolean; animate: boolean }) {
   const text = textOf(e)
   const t = toDate(e.timestamp).getTime()
   const [menu, setMenu] = useState(false)
@@ -73,10 +75,10 @@ function Row({ e, i, onSweep, onRetry, retrying }: { e: Entry; i: number; onSwee
     // Swept rows lift out; popLayout lets the kept rows reflow underneath them. The stagger is
     // capped so a big sweep still ends quickly.
     <motion.div className={s.row} layout="position" data-menu={menu}
-      exit={{ opacity: 0, y: -6, transition: { duration: .22, delay: Math.min(i, 12) * .018, ease: [.4, 0, .2, 1] } }}>
+      exit={animate ? { opacity: 0, y: -6, transition: { duration: .22, delay: Math.min(i, 12) * .018, ease: [.4, 0, .2, 1] } } : undefined}>
       <span className={s.time}>{flowTime(t)}</span>
       <span className={s.text}>
-        {retrying ? <span className={s.skeleton} aria-label="Retrying" /> : text || (
+        {retrying ? <span className={s.skeleton} aria-label="Retrying" /> : text ? <>{text}{e.transcriptOrigin === 'staged' && <span className={s.staged}>Staged for this concept: there is no audio to transcribe, so this one recovery is scripted.</span>}</> : (
           // Flow's own desktop row copy, captured 14 Sep: a dismissed transcription offers Recover;
           // a long recording that came back blank reads "Retry your 0:05 transcription".
           e.status === 'dismissed' ? <span className={s.rowNote}>This transcription was dismissed. <button className={s.textLink} disabled>Recover</button></span>

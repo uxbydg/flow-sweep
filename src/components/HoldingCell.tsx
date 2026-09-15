@@ -7,6 +7,7 @@ import { leavesOn, leaveLabel } from '../sweep/holding.ts'
 import { REASON_LABEL } from '../sweep/labels.ts'
 import { toDate, flowTime, shortDate } from '../format.ts'
 import { RotateCcw } from '../icons.ts'
+import { usePageVisible } from '../usePageVisible.ts'
 
 interface Props {
   items: SweptItem[]
@@ -18,6 +19,7 @@ interface Props {
 
 // Grouped by the day rows LEAVE, not the day they were said: the question here is "how long do I have".
 export function HoldingCell({ items, byId, reasons, now, onRestore }: Props) {
+  const visible = usePageVisible()
   const groups = useMemo(() => {
     const m = new Map<number, SweptItem[]>()
     for (const it of items) {
@@ -32,7 +34,7 @@ export function HoldingCell({ items, byId, reasons, now, onRestore }: Props) {
   return (
     <AnimatePresence initial={false}>
       {groups.map(([day, rows]) => (
-        <motion.section key={day} aria-label={leaveLabel(day, now)} exit={{ opacity: 0 }}>
+        <motion.section key={day} aria-label={leaveLabel(day, now)} exit={visible ? { opacity: 0 } : undefined}>
           <h3 className={`${s.label} ${s.dayLabel}`}>{leaveLabel(day, now)} · {rows.length}</h3>
           <div className={s.day}>
             <AnimatePresence initial={false} mode="popLayout">
@@ -43,8 +45,8 @@ export function HoldingCell({ items, byId, reasons, now, onRestore }: Props) {
                 const r = reasons.get(it.id)
                 return (
                   <motion.div key={it.id} className={s.row} layout="position"
-                    initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                    exit={{ opacity: 0, x: 12, transition: { duration: .2 } }}>
+                    initial={visible ? { opacity: 0 } : false} animate={{ opacity: 1 }}
+                    exit={visible ? { opacity: 0, x: 12, transition: { duration: .2 } } : undefined}>
                     <span className={s.time}>{shortDate(t)}, {flowTime(t)}</span>
                     <span className={s.text}>
                       {textOf(e) || <span style={{ color: 'var(--label)' }}>No text</span>}

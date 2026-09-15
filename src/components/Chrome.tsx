@@ -38,7 +38,7 @@ export function Titlebar() {
     <div className={s.titlebar} aria-hidden="true">
       <span className={s.lights}><i /><i /><i /></span>
       <PanelLeft size={16} />
-      <span className={s.titleSpacer} />
+      <span className={s.titleSpacer}>A concept for Wispr Flow's History view. Not affiliated with Wispr. Flow's chrome is reproduced for fidelity.</span>
       <Bell size={16} />
       <CircleUserRound size={16} />
     </div>

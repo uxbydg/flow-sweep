@@ -70,7 +70,7 @@ export default function App() {
   const goneIds = useMemo(() => new Set(gone), [gone])
   const live = useMemo(() => allEntries
     .filter(e => !sweptIds.has(e.id) && !goneIds.has(e.id))
-    .map(e => recovered.has(e.id) ? { ...e, formattedText: recovered.get(e.id)! } : e), [sweptIds, goneIds, recovered])
+    .map(e => recovered.has(e.id) ? { ...e, formattedText: recovered.get(e.id)!, transcriptOrigin: 'staged' } : e), [sweptIds, goneIds, recovered])
   const cands = useMemo(() => detect(live), [live])
   const sum = useMemo(() => summarize(live, cands), [live, cands])
   const retryIds = useMemo(() => new Set(cands.filter(c => c.reason === 'retry').map(c => c.entry.id)), [cands])
@@ -260,8 +260,8 @@ export default function App() {
       {toast && <Toast text={toast} />}
       <AnimatePresence>
         {confirmEmpty && (
-          <Confirm key="confirm" title="Empty the holding cell?" body={`${swept.length} swept transcripts will be deleted for good. This cannot be undone.`}
-            action="Yes, delete them" onConfirm={emptyNow} onClose={() => setConfirmEmpty(false)} />
+          <Confirm key="confirm" title={`Are you sure you want to delete ${swept.length === 1 ? 'this transcript' : `these ${swept.length} transcripts`}?`}
+            body="Once deleted they cannot be recovered." action="Yes, delete them" onConfirm={emptyNow} onClose={() => setConfirmEmpty(false)} />
         )}
       </AnimatePresence>
     </div>

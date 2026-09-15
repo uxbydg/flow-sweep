@@ -1,10 +1,12 @@
 import { useEffect, useRef, type ReactNode } from 'react'
 import { motion } from 'motion/react'
+import { usePageVisible } from '../usePageVisible.ts'
 import s from '../App.module.scss'
 import { X } from '../icons.ts'
 
 function Modal({ children, wide, labelledBy, onClose }: { children: ReactNode; wide?: boolean; labelledBy: string; onClose: () => void }) {
   const ref = useRef<HTMLDivElement>(null)
+  const visible = usePageVisible()
   useEffect(() => {
     const prev = document.activeElement as HTMLElement | null
     ref.current?.querySelector<HTMLElement>('[data-autofocus]')?.focus()
@@ -13,11 +15,11 @@ function Modal({ children, wide, labelledBy, onClose }: { children: ReactNode; w
     return () => { window.removeEventListener('keydown', onKey); prev?.focus() }
   }, [onClose])
   return (
-    <motion.div className={s.scrim} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: .16 }}
+    <motion.div className={s.scrim} initial={visible ? { opacity: 0 } : false} animate={{ opacity: 1 }} exit={visible ? { opacity: 0 } : undefined} transition={{ duration: .16 }}
       onMouseDown={e => { if (e.target === e.currentTarget) onClose() }}>
       <motion.div ref={ref} role="dialog" aria-modal="true" aria-labelledby={labelledBy}
         className={`${s.dialog} ${wide ? s.dialogWide : ''}`}
-        initial={{ opacity: 0, scale: .98, y: 6 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: .98 }}
+        initial={visible ? { opacity: 0, scale: .98, y: 6 } : false} animate={{ opacity: 1, scale: 1, y: 0 }} exit={visible ? { opacity: 0, scale: .98 } : undefined}
         transition={{ duration: .2, ease: [.2, .8, .2, 1] }}>
         {children}
       </motion.div>

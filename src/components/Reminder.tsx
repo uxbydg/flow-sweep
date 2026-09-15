@@ -4,6 +4,7 @@ import { X } from '../icons.ts'
 import type { Reason } from '../data/types.ts'
 import { REASON_LABEL } from '../sweep/labels.ts'
 import { plural } from '../format.ts'
+import { usePageVisible } from '../usePageVisible.ts'
 
 interface Props {
   counts: Partial<Record<Reason, number>>
@@ -16,9 +17,10 @@ interface Props {
 // Shows only on a day swept transcripts reach the end of their hold. Flow's own surface, not a red
 // box: coral is reserved for the one destructive word, "tonight".
 export function Reminder({ counts, total, onReview, onKeep, onDismiss }: Props) {
+  const visible = usePageVisible()
   return (
     <motion.section className={s.reminder} aria-labelledby="reminderTitle"
-      initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: .24, ease: [.2, .8, .2, 1] }}>
+      initial={visible ? { opacity: 0, y: 6 } : false} animate={{ opacity: 1, y: 0 }} exit={visible ? { opacity: 0, y: -4 } : undefined} transition={{ duration: .24, ease: [.2, .8, .2, 1] }}>
       <div className={s.reminderHead}>
         <h3 id="reminderTitle">{plural(total, 'swept transcript')} {total === 1 ? 'leaves' : 'leave'} for good <em>tonight</em></h3>
         <button className={s.icon} style={{ margin: '-5px -6px 0 0' }} aria-label="Dismiss until tomorrow" data-tip="Dismiss" onClick={onDismiss}><X size={14} /></button>
