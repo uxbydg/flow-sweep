@@ -69,11 +69,14 @@
   background: #1A1A1A; color: #fff; font-size: 11px; font-weight: 500; line-height: 1; white-space: nowrap; padding: 7px 9px; border-radius: var(--r-sm); pointer-events: none; z-index: 5; }
 
 // ---------- history ----------
-.bar { position: sticky; top: 40px; z-index: 4; background: var(--page); display: flex; align-items: center; gap: 6px; padding: 8px 0 8px; min-height: 44px; }
+.bar { position: sticky; top: 40px; z-index: 4; background: var(--page); display: flex; align-items: center; gap: 0; padding: 4px 0; min-height: 44px;
+  // Flow's bar icons: bare grey glyph at rest, a 36 px #F5F4F0 box with the glyph in ink on hover, flush with the card's right edge
+  .icon { width: 36px; height: 36px; border-radius: var(--r); &:hover { background: var(--surface); color: var(--ink); } }
+}
 .label { font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--label); margin: 0; }
 .barSpacer { flex: 1; }
 // Sits in the empty quadrant below the broom's handle, never on the glyph.
-.dot { position: absolute; bottom: 1px; right: 1px; width: 5px; height: 5px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 0 1.5px var(--page); }
+.dot { position: absolute; bottom: 7px; right: 7px; width: 5px; height: 5px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 0 1.5px var(--page); }
 .sweptLink { border: 0; background: transparent; font-size: 12px; color: var(--ink-2); padding: 4px 8px; border-radius: var(--r-sm); cursor: pointer; font-variant-numeric: tabular-nums;
   &:hover { background: var(--line); color: var(--ink); } }
 .searchBox { display: flex; align-items: center; gap: 6px; border-bottom: 1px solid var(--line); margin-right: 4px; color: var(--mut);

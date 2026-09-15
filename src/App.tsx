@@ -20,6 +20,7 @@ import { Toast } from './components/Toast.tsx'
 import { Search, Broom, ArrowLeft, RotateCcw, X } from './icons.ts'
 
 const DAY = 864e5
+const RECOVERED_TEXT = 'Okay, go back to the punch list and take the top three in order. Start with the header, then the card art, then the footer. Show me each one in the browser before you move on to the next.'
 const byId = new Map<string, Entry>(allEntries.map(e => [e.id, e]))
 // Reason at classification time, so the holding cell can say why a row was swept.
 const reasonOf = new Map<string, Reason>(detect(allEntries).map(c => [c.entry.id, c.reason]))
@@ -52,29 +53,33 @@ export default function App() {
   const [sweepOpen, setSweepOpen] = useState(false)
   const [q, setQ] = useState('')
   const [searchOpen, setSearchOpen] = useState(false)
-  const [filterBlank, setFilterBlank] = useState(false)
+  const [blankIds, setBlankIds] = useState<Set<string> | null>(null)
+  const filterBlank = blankIds !== null
   const [searching, setSearching] = useState(false)
   const [confirmEmpty, setConfirmEmpty] = useState(false)
   const [choices, setChoices] = useState<Map<string, boolean>>(new Map())
   const [dismissed, setDismissed] = useState<string | null>(loadDismissed)
   const [retrying, setRetrying] = useState<Set<string>>(new Set())
   const [toast, setToast] = useState<string | null>(null)
+  const [recovered, setRecovered] = useState<Map<string, string>>(new Map())
 
   useEffect(() => { saveSwept(swept) }, [swept])
   useEffect(() => { saveGone(gone) }, [gone])
 
   const sweptIds = useMemo(() => new Set(swept.map(it => it.id)), [swept])
   const goneIds = useMemo(() => new Set(gone), [gone])
-  const live = useMemo(() => allEntries.filter(e => !sweptIds.has(e.id) && !goneIds.has(e.id)), [sweptIds, goneIds])
+  const live = useMemo(() => allEntries
+    .filter(e => !sweptIds.has(e.id) && !goneIds.has(e.id))
+    .map(e => recovered.has(e.id) ? { ...e, formattedText: recovered.get(e.id)! } : e), [sweptIds, goneIds, recovered])
   const cands = useMemo(() => detect(live), [live])
   const sum = useMemo(() => summarize(live, cands), [live, cands])
   const retryIds = useMemo(() => new Set(cands.filter(c => c.reason === 'retry').map(c => c.entry.id)), [cands])
   const visible = useMemo(() => {
-    if (filterBlank) return live.filter(e => retryIds.has(e.id))
+    if (blankIds) return live.filter(e => blankIds.has(e.id))
     const needle = q.trim().toLowerCase()
     if (!needle) return live
     return live.filter(e => textOf(e).toLowerCase().includes(needle) || appLabel(e.app).toLowerCase().includes(needle))
-  }, [live, q, filterBlank, retryIds])
+  }, [live, q, blankIds])
 
   // Flow's search spins for a moment after every keystroke, then the list is just the matches.
   useEffect(() => {
@@ -83,9 +88,12 @@ export default function App() {
     const id = window.setTimeout(() => setSearching(false), 450)
     return () => window.clearTimeout(id)
   }, [q])
-  const showBlank = () => { setSweepOpen(false); setQ(''); setSearchOpen(false); setFilterBlank(true); window.scrollTo({ top: 0 }) }
   // Flow's search matches text only, so this set is a view like the holding cell, not a search token.
-  const clearSearch = () => { setQ(''); setFilterBlank(false); setSearchOpen(false) }
+  // It snapshots its rows on entry so a transcript that comes back stays in view, with its words.
+  const showBlank = () => { setSweepOpen(false); setQ(''); setSearchOpen(false); setBlankIds(new Set(retryIds)); window.scrollTo({ top: 0 }) }
+  const clearSearch = () => { setQ(''); setBlankIds(null); setSearchOpen(false) }
+  // still blank: a recovered row stays in the view with its words but leaves the count
+  const blankLeft = useMemo(() => visible.filter(e => retryIds.has(e.id)), [visible, retryIds])
 
   // Selected = the classifier's default unless the person said otherwise.
   const selected = useCallback((c: Candidate) => {
@@ -106,12 +114,17 @@ export default function App() {
   }
   // Flow's retry, as captured: the row pulses while it works, then a toast reports the result.
   // The concept holds no audio, so every retry ends the way Flow's did on 14 Sep: it fails.
+  // The concept holds no audio, so a retry cannot really transcribe. The longest blank recording
+  // comes back with words (invented, so the success state can be seen); the rest fail as Flow's did.
   const retry = (ids: string[]) => {
     if (!ids.length) return
     setRetrying(prev => new Set([...prev, ...ids]))
+    const longest = [...ids].sort((a, b) => (byId.get(b)?.duration ?? 0) - (byId.get(a)?.duration ?? 0))[0]
+    const wins = ids.includes(longest) && (byId.get(longest)?.duration ?? 0) >= 60 ? longest : null
     ids.forEach((id, i) => window.setTimeout(() => {
       setRetrying(prev => { const n = new Set(prev); n.delete(id); return n })
-      if (i === ids.length - 1) { setToast('Retry failed. Please try again.'); window.setTimeout(() => setToast(null), 4000) }
+      if (id === wins) setRecovered(prev => new Map(prev).set(id, RECOVERED_TEXT))
+      if (i === ids.length - 1 && ids.some(x => x !== wins)) { setToast('Retry failed. Please try again.'); window.setTimeout(() => setToast(null), 4000) }
     }, 1600 + i * 350))
   }
   const sweepOne = (id: string) => setSwept(prev => [{ id, sweptAt: t }, ...prev])
@@ -141,7 +154,7 @@ export default function App() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape' || confirmEmpty) return
-      if (sweepOpen) setSweepOpen(false); else if (filterBlank) setFilterBlank(false); else if (view !== 'history') setView('history')
+      if (sweepOpen) setSweepOpen(false); else if (filterBlank) setBlankIds(null); else if (view !== 'history') setView('history')
     }
     window.addEventListener('keydown', onKey); return () => window.removeEventListener('keydown', onKey)
   }, [view, sweepOpen, filterBlank, confirmEmpty])
@@ -163,7 +176,7 @@ export default function App() {
               {filterBlank ? (
                 <>
                   <button className={s.cellBack} onClick={clearSearch}><ArrowLeft size={15} />History</button>
-                  <h2 className={s.cellTitle}>Came back blank · {visible.length}</h2>
+                  <h2 className={s.cellTitle}>Came back blank · {blankLeft.length}</h2>
                 </>
               ) : view === 'cell' ? (
                 <>
@@ -196,7 +209,7 @@ export default function App() {
                     </label>
                   ) : (
                     // Flow's bar is bare glyphs: the field appears only once search is asked for.
-                    <button className={s.icon} data-tip="Search" aria-label="Search transcripts" onClick={() => setSearchOpen(true)}><Search size={16} /></button>
+                    <button className={s.icon} aria-label="Search transcripts" onClick={() => setSearchOpen(true)}><Search size={16} /></button>
                   )}
                   <button className={s.icon} data-tip="Sweep" data-on={sweepOpen} aria-expanded={sweepOpen} aria-controls="sweepCard" aria-label={`Sweep, ${sum.candidates} to review`} onClick={() => setSweepOpen(o => !o)}>
                     <Broom size={16} />
@@ -206,11 +219,11 @@ export default function App() {
               )}
             </div>
 
-            {view === 'history' && filterBlank && (
+            {view === 'history' && filterBlank && blankLeft.length > 0 && (
               <p className={s.filterNote}>
-                {visible.length} transcriptions came back blank.{' '}
-                <button className={s.textLink} disabled={[...retryIds].some(id => retrying.has(id))} onClick={() => retry(visible.map(e => e.id))}>
-                  {[...retryIds].some(id => retrying.has(id)) ? 'Retrying…' : `Retry your ${visible.length} transcriptions`}
+                {blankLeft.length} {blankLeft.length === 1 ? 'transcription' : 'transcriptions'} came back blank.{' '}
+                <button className={s.textLink} disabled={blankLeft.some(e => retrying.has(e.id))} onClick={() => retry(blankLeft.map(e => e.id))}>
+                  {blankLeft.some(e => retrying.has(e.id)) ? 'Retrying…' : `Retry your ${blankLeft.length} ${blankLeft.length === 1 ? 'transcription' : 'transcriptions'}`}
                 </button>
               </p>
             )}
@@ -238,7 +251,7 @@ export default function App() {
         </div>
       </div>
 
-      <AnimatePresence>{toast && <Toast key="toast" text={toast} />}</AnimatePresence>
+      {toast && <Toast text={toast} />}
       <AnimatePresence>
         {confirmEmpty && (
           <Confirm key="confirm" title="Empty the holding cell?" body={`${swept.length} swept transcripts will be deleted for good. This cannot be undone.`}
