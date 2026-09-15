@@ -14,7 +14,8 @@ import { Titlebar, Sidebar, Banner, Stats } from './components/Chrome.tsx'
 import { HistoryList } from './components/HistoryList.tsx'
 import { HoldingCell } from './components/HoldingCell.tsx'
 import { Reminder } from './components/Reminder.tsx'
-import { SweepDialog, Confirm } from './components/Dialogs.tsx'
+import { SweepView } from './components/SweepView.tsx'
+import { Confirm } from './components/Dialogs.tsx'
 import { Search, Broom, ArrowLeft, RotateCcw } from './icons.ts'
 
 const DAY = 864e5
@@ -46,10 +47,9 @@ export default function App() {
     }
     return items
   })
-  const [view, setView] = useState<'history' | 'cell'>('history')
+  const [view, setView] = useState<'history' | 'cell' | 'sweep'>('history')
   const [q, setQ] = useState('')
   const [searchOpen, setSearchOpen] = useState(false)
-  const [sweepOpen, setSweepOpen] = useState(false)
   const [confirmEmpty, setConfirmEmpty] = useState(false)
   const [choices, setChoices] = useState<Map<string, boolean>>(new Map())
   const [dismissed, setDismissed] = useState<string | null>(loadDismissed)
@@ -80,9 +80,10 @@ export default function App() {
 
   const sweep = () => {
     const chosen = cands.filter(selected).map(c => ({ id: c.entry.id, sweptAt: t }))
-    setSwept(prev => [...chosen, ...prev])
     setChoices(new Map())
-    setSweepOpen(false)
+    setView('history')
+    // History mounts with the rows still in it, then they lift out with the stagger.
+    window.setTimeout(() => setSwept(prev => [...chosen, ...prev]), 80)
   }
   const sweepOne = (id: string) => setSwept(prev => [{ id, sweptAt: t }, ...prev])
   const restore = (id: string) => setSwept(prev => prev.filter(it => it.id !== id))
@@ -109,9 +110,9 @@ export default function App() {
   const dismiss = () => { setDismissed(today); saveDismissed(today) }
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && view === 'cell' && !sweepOpen && !confirmEmpty) setView('history') }
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && view !== 'history' && !confirmEmpty) setView('history') }
     window.addEventListener('keydown', onKey); return () => window.removeEventListener('keydown', onKey)
-  }, [view, sweepOpen, confirmEmpty])
+  }, [view, confirmEmpty])
 
   const firstDay = visible[0] ? dayLabel(toDate(visible[0].timestamp).getTime(), t) : 'Today'
 
@@ -127,7 +128,12 @@ export default function App() {
             <Banner />
 
             <div className={s.bar}>
-              {view === 'cell' ? (
+              {view === 'sweep' ? (
+                <>
+                  <button className={s.cellBack} onClick={() => setView('history')}><ArrowLeft size={15} />History</button>
+                  <h2 className={s.cellTitle}>Sweep</h2>
+                </>
+              ) : view === 'cell' ? (
                 <>
                   <button className={s.cellBack} onClick={() => setView('history')}><ArrowLeft size={15} />History</button>
                   <h2 className={s.cellTitle}>Swept · {swept.length}</h2>
@@ -159,7 +165,7 @@ export default function App() {
                     // Flow's bar is bare glyphs: the field appears only once search is asked for.
                     <button className={s.icon} data-tip="Search" aria-label="Search transcripts" onClick={() => setSearchOpen(true)}><Search size={16} /></button>
                   )}
-                  <button className={s.icon} data-tip="Sweep" data-on={sweepOpen} aria-label={`Sweep, ${sum.candidates} to review`} onClick={() => setSweepOpen(true)}>
+                  <button className={s.icon} data-tip="Sweep" aria-label={`Sweep, ${sum.candidates} to review`} onClick={() => setView('sweep')}>
                     <Broom size={16} />
                     {sum.candidates > 0 && <i className={s.dot} />}
                   </button>
@@ -167,9 +173,11 @@ export default function App() {
               )}
             </div>
 
-            {view === 'cell'
-              ? <HoldingCell items={swept} byId={byId} reasons={reasonOf} now={t} onRestore={restore} />
-              : <HistoryList entries={visible} now={t} onSweepOne={sweepOne} />}
+            {view === 'sweep'
+              ? <SweepView cands={cands} sum={sum} selected={selected} setMany={setMany} onSweep={sweep} onClose={() => setView('history')} />
+              : view === 'cell'
+                ? <HoldingCell items={swept} byId={byId} reasons={reasonOf} now={t} onRestore={restore} />
+                : <HistoryList entries={visible} now={t} onSweepOne={sweepOne} />}
             {view === 'history' && (
               <p className={s.more}>{live.length} transcripts · {usingRealData ? 'real history, local only' : 'sample data'}</p>
             )}
@@ -188,10 +196,6 @@ export default function App() {
       </div>
 
       <AnimatePresence>
-        {sweepOpen && (
-          <SweepDialog key="sweep" cands={cands} sum={sum} selected={selected} setMany={setMany}
-            onSweep={sweep} onClose={() => setSweepOpen(false)} />
-        )}
         {confirmEmpty && (
           <Confirm key="confirm" title="Empty the holding cell?" body={`${swept.length} swept transcripts will be deleted for good. This cannot be undone.`}
             action="Yes, delete them" onConfirm={emptyNow} onClose={() => setConfirmEmpty(false)} />
