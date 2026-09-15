@@ -1,4 +1,10 @@
-# Transcript Sweep — spec (one page)
+# Transcript Sweep — spec
+
+> **Read the dated sections at the bottom first.** They supersede the top: the four-state flow with a
+> Summary sheet became one card the broom unfolds above the list (14 September), and the numbers were
+> re-run against the code on 15 September. Current counts on the real 874: 97 empty, 40 cut off (12 sure,
+> 28 asked about), 1 marked for removal, 43 short replies, 3 to retry; 122 preselected, 138 candidates,
+> about 1 in 6.
 
 A concept for Wispr Flow's history view: find the entries that are almost certainly accidents,
 show them in one place with the reason and the confidence, sweep them in one motion, and keep
@@ -38,19 +44,21 @@ Result: 141 candidates, **125 selected, about 1 in 6** (was 145 selected, 1 in 5
    actions: Review, Not now.
 3. **Review.** Candidates grouped by reason. Each row: reason chip, confidence, app, time, the text.
    Everything above threshold is selected. One tap to keep. Nothing leaves on detection.
-   Primary action names the count: "Sweep 187".
+   Primary action names the count: "Sweep 122".
 4. **Swept.** A place, not a toast. The swept rows live here with a Restore per row and Restore all.
    Nothing is permanently deleted in this concept. (Flow's docs: "deleted transcripts cannot be
    recovered." This is the answer to that.)
 
-## Motion carries the meaning
+## Motion carries the meaning (as built, 15 September)
 
-- Summary sheet rises; counts settle in sequence, not at once.
-- Review: keeping a row settles it (scale 1.0 → 1.0, opacity to full, chip fades); sweeping lifts
-  the selected rows out (y −8, opacity 0, 180 ms, staggered 20 ms) while kept rows reflow with a
-  layout animation.
-- Swept bucket: restore is the reverse, so the two motions are a pair.
-- Reduced motion: opacity only.
+- The card unfolds above the list on a height transition (330 ms, one easing) so the rows slide with
+  it instead of jumping; the fold closes first on Sweep, then the swept rows lift out (y −6, opacity 0,
+  220 ms, staggered 18 ms, capped at 12 rows) while the kept rows reflow.
+- Restore lifts a row out of the holding cell sideways (x +12); it is not yet the exact mirror of sweep.
+- Reduced motion: Motion honours the OS setting (MotionConfig reducedMotion="user") and the CSS
+  transitions are cancelled by the global rule.
+- While the tab is hidden the list skips its animations, because browsers pause the animation clock
+  there and an exit that never finishes would leave a row behind.
 
 ## Keyboard and size
 
@@ -77,10 +85,11 @@ Never cut: review before sweep, the Swept place with restore, real data locally.
 ## Decided 14 September (Daniel)
 
 **Swept is a 7-day holding cell, not a delete.**
-- Swept rows leave History at once, stay restorable for 7 days, then are permanently deleted.
-- **Empty now** in the holding cell, for anyone who wants them gone today.
-- **Respects Flow's auto-delete setting.** If transcripts auto-delete sooner, swept rows go on that
-  schedule. The sweep never keeps words longer than the person already told Flow to.
+- Swept rows leave History at once, stay restorable for 7 days, then leave for good (in the concept:
+  a local "gone" list; nothing is deleted from Flow).
+- **Empty now** in the holding cell, for anyone who wants them gone today, behind Flow's own confirm.
+- **Should respect Flow's auto-delete setting** (not built: the concept cannot read Flow's settings).
+  If transcripts auto-delete sooner, swept rows would go on that schedule.
 - **Section-level select** on every Review header (take or leave a whole section). Short replies still
   start unselected.
 
@@ -155,7 +164,8 @@ Then one line for Retry (long empties) and one for short replies, and two button
 The rows lift out of the list beneath the card. The tab-strip view and the modal are both gone.
 
 **Retry, as Flow does it (14 September, late, from Daniel's captures):** "Retry your 0:05 transcription" (Flow desktop, the link is Retry and the length is the recording's) → the row's text becomes a pulsing grey bar → on failure a dark toast bottom
-right, red alert mark, "Retry failed. Please try again." The concept holds no audio, so every retry
-in it ends the way Flow's did that night: it fails, and the row offers Retry again. Live from the card
+right, red alert mark, "Retry failed. Please try again." The concept holds no audio, so a retry cannot
+transcribe anything: one recovery (the longest blank recording) is staged with invented words so the
+success state can be seen, and says so on the row; the rest fail the way Flow's did that night. Live from the card
 line, from a row's Retry, and from the row menu's Retry transcript. The card's mark is the broom, not a
 check. A dismissed transcription reads "This transcription was dismissed. Recover" (Flow's desktop copy).

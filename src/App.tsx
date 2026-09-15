@@ -40,12 +40,13 @@ export default function App() {
       items = items.filter(it => !isExpired(it, clock()))
       saveGone([...loadGone(), ...expired.map(it => it.id)])
     }
-    // ?demo=reminder seeds a batch that leaves tonight.
-    if (demoReminder && !items.length) {
+    // ?demo=reminder seeds a batch that leaves tonight, on top of anything already swept.
+    if (demoReminder && !items.some(it => leavesOn(it) === startOfDay(clock()))) {
       const cands = detect(allEntries).filter(c => !OPT_IN.includes(c.reason) && c.confidence >= DEFAULT_THRESHOLD)
       const take = (r: Reason, n: number) => cands.filter(c => c.reason === r).slice(0, n)
-      items = [...take('empty', 8), ...take('cutoff', 3), ...take('flagged', 1)]
-        .map(c => ({ id: c.entry.id, sweptAt: clock() - HOLD_DAYS * DAY }))
+      const have = new Set(items.map(it => it.id))
+      items = [...items, ...[...take('empty', 8), ...take('cutoff', 3), ...take('flagged', 1)]
+        .filter(c => !have.has(c.entry.id)).map(c => ({ id: c.entry.id, sweptAt: clock() - HOLD_DAYS * DAY }))]
     }
     return items
   })

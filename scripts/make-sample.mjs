@@ -33,10 +33,27 @@ const SENTENCES = [
   'Can you list what is still open, what is done, and what is blocked, in that order?',
   'I like where this is going. Tighten the spacing under the title and we are close.',
   'Do not delete anything yet. Move it somewhere it can come back from and we will review it later.',
+  'Can you check whether the link in the footer still points at the old page?',
+  'I would rather ship the simple version this week and add the filter later if people ask for it.',
+  'Go through the list once more and flag anything that still says draft.',
+  'The photo on the left is too dark. Lift it a little or swap it for the other one.',
+  'Let us book the room for two in the afternoon and send the agenda tonight.',
+  'Please rename the file so it matches the others, and keep the date at the front.',
+  'I read your notes on the train. Most of it I agree with, and the second point changes my mind.',
+  'Hold the release until the copy is signed off, then go.',
+  'If the test fails again, print the values it is comparing and send me the output.',
+  'Move the button up next to the title so people see it before they scroll.',
+  'That is exactly what I meant. Do the same for the other three screens.',
+  'Can you draft a short reply saying we will have it to them by Wednesday?',
+  'Try it at the narrow width before you call it done. Last time the tabs wrapped.',
+  'Leave the colours alone for now. The spacing is what is bothering me.',
+  'We are close. One more pass on the wording and I think we can send it.',
+  'Add a note to the plan that the reminder card only appears on the last day.',
+  'Yes, the second option, and make the label say what it does rather than what it is.',
 ]
 const SHORT = ['Hey.', 'Yep.', 'Sure.', 'Okay!', 'Thanks so much.', 'On it.', 'Sounds good to me.', 'Talk soon.', 'Got it, thanks.', 'Perfect, do that.', 'Nope.', 'See you then.']
 // unfinished fragments, the way a hotkey released early leaves them
-const CUT = ['Can we', 'I think the', 'So the', 'Let me', 'and then', 'Make sure to', 'Okay, so', 'Take the', 'Th', 'Ac', 'to', 'the', ',', '...', 'Bu']
+const CUT = ['Can we', 'I think the', 'So the', 'Let me', 'and then', 'Make sure to', 'Okay, so', 'Take the', 'Th', 'Ac', 'to', 'the', ',', '...', 'Bu', 'What about the', 'Is there a', 'We should', 'Before you', 'I was going to', 'Send me the', 'Do we have', 'Check the', 'Okay', 'Right now', 'One more', 'Actually', 'Hold on', 'Wait, is', 'Then we', 'The other', 'In the', 'For the', 'Maybe we', 'Could you', 'It looks like', 'Not the', 'On the', 'Try the', 'When the', 'So I', 'Yes, but', 'No, the', 'Hmm', 'Oh, the', 'And the', 'Se', 'Wh', 'Pro', 'Ma']
 const FLAGS = ['Never mind, scratch that.', 'Oops, ignore that one.', 'Scratch that, wrong window.', 'Clean up, not what I meant.', 'Never mind.', 'Delete that, starting over.']
 const sentence = (n) => { let s = pick(SENTENCES); while (s.split(' ').length < n) s += (Math.random() < 0.3 ? '\n\n' : ' ') + pick(SENTENCES); return s }
 const out = []; const start = Date.UTC(2026, 7, 8, 1, 0, 0); const span = 35 * 864e5
