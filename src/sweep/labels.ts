@@ -1,11 +1,12 @@
 import type { Reason } from '../data/types.ts'
 
 // Flow already has a Flag action on every row, so the self-flag section does not say "flagged".
+// It names what the person did, in Flow's second-person voice: they said never mind, scratch that, oops.
 export const REASON_LABEL: Record<Reason, string> = {
   empty: 'Empty',
   retry: 'Retry first',
   cutoff: 'Cut off',
-  flagged: 'You said to drop it',
+  flagged: 'You said never mind',
   reply: 'Short replies',
 }
 

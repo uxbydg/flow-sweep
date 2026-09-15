@@ -43,16 +43,20 @@ export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose, onS
 
       {/* Flow's tab strip: the breakdown, and each tab opens its own rows so every one can be seen and kept */}
       <div className={`${s.tabs} ${s.cardTabs}`} role="tablist" aria-label="What Flow will sweep">
-        {sections.map(({ r, rows }) => (
-          <button key={r} role="tab" className={s.tab} aria-selected={open === r} aria-controls="sweepRows" onClick={() => setOpen(o => o === r ? null : r)}>
-            {REASON_LABEL[r]}<small>{rows.length}</small>
-          </button>
-        ))}
+        {sections.map(({ r, rows }) => {
+          const on = rows.filter(selected).length
+          return (
+            <button key={r} role="tab" className={s.tab} aria-selected={open === r} aria-controls="sweepRows" onClick={() => setOpen(o => o === r ? null : r)}>
+              {REASON_LABEL[r]}<small data-partial={on !== rows.length}>{on === rows.length ? rows.length : `${on} of ${rows.length}`}</small>
+            </button>
+          )
+        })}
       </div>
       {shown && (
         <div id="sweepRows" role="tabpanel" className={s.allList}>
           <div className={s.allHead}>
             <span className={s.sectionCount}>{shownOn} of {shown.rows.length} selected</span>
+            <span className={s.confHead}>How sure Flow is it's an accident</span>
             <label className={s.selectAll}>
               <input type="checkbox" className={s.check} checked={shownOn === shown.rows.length} aria-label={`Select all ${REASON_LABEL[shown.r]}`}
                 onChange={e => setMany(shown.rows.map(c => c.entry.id), e.target.checked)} />Select all
@@ -63,7 +67,7 @@ export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose, onS
               <input type="checkbox" className={s.check} checked={selected(c)} onChange={e => setMany([c.entry.id], e.target.checked)} />
               <span>{textOf(c.entry) ? <span className={s.candText}>{textOf(c.entry)}</span> : <span className={s.candEmpty}>No text</span>}
                 <span className={s.why}>{c.why} · {appLabel(c.entry.app)} · {shortDate(toDate(c.entry.timestamp).getTime())}</span></span>
-              <span className={s.conf}>{pct(c.confidence)}</span>
+              <span className={s.conf} aria-label={`${pct(c.confidence)} sure`}>{pct(c.confidence)}</span>
             </label>
           ))}
         </div>
@@ -99,7 +103,7 @@ export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose, onS
       )}
 
       <div className={s.sweepActions}>
-        <p>Restorable for 7 days.</p>
+        <p>Restorable for 7 days.{sum.reply > 0 && decided.filter(c => c.reason === 'reply' && selected(c)).length === 0 && <> {sum.reply} short replies stay.</>}</p>
         <button className={s.chip} onClick={onClose}>Not now</button>
         <button className={s.chip} data-kind="dark" disabled={!going} onClick={onSweep}>Sweep {going}</button>
       </div>

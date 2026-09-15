@@ -131,7 +131,7 @@ drawn, not wired. Tooltips and the menu hang past the card edge, so nothing in t
 **Review is not a modal (decided 14 September, late, Daniel):** Flow's tab strip is how every page
 segments a list (Insights, Dictionary, Snippets, Style), and Flow's only modal is the delete confirm.
 So Sweep is a view inside History, like the holding cell: the summary sentence, then the tab strip
-(Empty · Cut off · You said to drop it · Retry first · Short replies, each with its count), one section
+(Empty · Cut off · You said never mind · Retry first · Short replies, each with its count), one section
 visible at a time, select-all for the section, and a sticky footer with the only two actions:
 **Not now** and **Sweep N**. The two-step Summary → Review is gone. The modal survives only for
 Empty now.
