@@ -48,6 +48,7 @@ export default function App() {
   })
   const [view, setView] = useState<'history' | 'cell'>('history')
   const [q, setQ] = useState('')
+  const [searchOpen, setSearchOpen] = useState(false)
   const [sweepOpen, setSweepOpen] = useState(false)
   const [confirmEmpty, setConfirmEmpty] = useState(false)
   const [choices, setChoices] = useState<Map<string, boolean>>(new Map())
@@ -146,10 +147,17 @@ export default function App() {
                       Swept · {swept.length}
                     </button>
                   )}
-                  <label className={s.searchBox}>
-                    <Search size={14} />
-                    <input placeholder="Search" value={q} onChange={e => setQ(e.target.value)} aria-label="Search transcripts" />
-                  </label>
+                  {searchOpen ? (
+                    <label className={s.searchBox}>
+                      <Search size={16} />
+                      <input autoFocus placeholder="Search" value={q} onChange={e => setQ(e.target.value)} aria-label="Search transcripts"
+                        onBlur={() => { if (!q) setSearchOpen(false) }}
+                        onKeyDown={e => { if (e.key === 'Escape') { e.stopPropagation(); setQ(''); setSearchOpen(false) } }} />
+                    </label>
+                  ) : (
+                    // Flow's bar is bare glyphs: the field appears only once search is asked for.
+                    <button className={s.icon} data-tip="Search" aria-label="Search transcripts" onClick={() => setSearchOpen(true)}><Search size={16} /></button>
+                  )}
                   <button className={s.icon} data-tip="Sweep" data-on={sweepOpen} aria-label={`Sweep, ${sum.candidates} to review`} onClick={() => setSweepOpen(true)}>
                     <Broom size={16} />
                     {sum.candidates > 0 && <i className={s.dot} />}

@@ -109,3 +109,15 @@ recordings (>30 s) get a **Retry first** section using Flow's existing "Retry tr
 - Empty state: one line, "Nothing swept. Anything you sweep stays here for 7 days."
 - Why not the sidebar: the sidebar lists features, the holding cell is a temporary state of History,
   and restoring feels safe when the rows sit beside where they came from.
+
+## From the Scratchpad captures (14 September, evening)
+
+- **The bar is bare glyphs.** Flow's Recents row is search, plus, and refresh as 16 px gray icons,
+  tightly spaced, no field and no box; the search field only appears on demand. Ours now matches:
+  search collapses to its icon, the broom sits beside it as the same bare glyph.
+- **The focus ring is amber** (#DA9A35, 2 px, small radius), not teal. Adopted site-wide.
+- **Scratchpad opens a second floating window.** Considered for Review and not adopted: the sweep
+  is a review before a destructive action, and Flow's own idiom for that is the modal confirm
+  ("Are you sure you want to delete this transcript?"). Scratchpad is a workspace you keep open
+  beside other apps; Review is a decision you finish and close. If Review ever grows past one
+  sitting (a threshold slider, per-row audio), the floating panel is the Flow-native answer.

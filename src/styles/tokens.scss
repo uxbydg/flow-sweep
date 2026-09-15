@@ -16,6 +16,7 @@
   --teal-soft: #E3ECEB;
   --coral: #DE726E;       // spent only on destructive actions
   --coral-ink: #B9504C;   // coral text on light surfaces (4.5:1 on --page)
+  --focus: #DA9A35;       // Flow's focus ring is amber (sampled from the Scratchpad Recents bar)
   --pro: #ECD8FC;
   --shadow-pop: 0 8px 28px rgba(26, 26, 26, .12), 0 1px 3px rgba(26, 26, 26, .08);
   --r-sm: 6px; --r: 8px; --r-lg: 12px; --r-xl: 16px;
@@ -27,5 +28,5 @@
 html, body, #root { height: 100%; }
 body { margin: 0; background: var(--chrome); color: var(--ink); font: 14px/1.5 var(--sans); -webkit-font-smoothing: antialiased; }
 button { font: inherit; color: inherit; }
-:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; border-radius: var(--r-sm); }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: var(--r-sm); }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
