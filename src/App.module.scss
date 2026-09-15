@@ -50,7 +50,7 @@
 .reminderActions { display: flex; gap: 6px; }
 
 // ---------- buttons ----------
-.chip { border: 0; background: var(--line); border-radius: var(--r-sm); padding: 5px 11px; font-size: 12px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+.chip { border: 0; background: var(--line); border-radius: var(--r-sm); padding: 5px 11px; font-size: 12px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
   &:hover { background: #E4E2DA; }
   &[data-kind="dark"] { background: var(--ink); color: #fff; &:hover { background: #333; } }
   &[data-kind="danger"] { background: var(--coral); color: #fff; &:hover { background: #D5625E; } }
@@ -95,6 +95,7 @@
   &:last-child { border-radius: 0 0 var(--r-lg) var(--r-lg); }
   &:first-child:last-child { border-radius: var(--r-lg); }
   &:hover, &:focus-within, &[data-menu="true"] { background: var(--hover); .actions { opacity: 1; } }
+  &:focus-visible { outline-offset: -2px; border-radius: var(--r-sm); }
   &[data-menu="true"] { z-index: 6; } }
 .time { font-size: 11.5px; color: var(--mut); padding: 12px 0; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .text { font-size: 13px; line-height: 1.55; padding: 11px 0; white-space: pre-wrap; overflow-wrap: anywhere; max-width: 400px; }
@@ -196,6 +197,17 @@
   .aside { position: static; order: -1; }
   .stats { display: none; }
   .banner { display: none; }
-  .row { grid-template-columns: 64px minmax(0, 1fr); .actions { display: none; } }
+  // the three ghost icons go; the three-dot stays so the menu is reachable at phone width
+  .row { grid-template-columns: 56px minmax(0, 1fr) auto; .actions { opacity: 1; } [data-ghost] { display: none; } }
+  .text { max-width: none; }
+  // the cell's date is wider than a time, and Restore has no hover to wait for on a phone
+  .row[data-cell] { grid-template-columns: 98px minmax(0, 1fr) auto; }
+  .restore { opacity: 1; }
+  // the card at phone width: strip and ask row wrap, the restore line sits above the buttons
+  .sweepCard { padding: 14px 14px 12px; }
+  .cardTabs { margin-left: 0; gap: 0 16px; flex-wrap: wrap; }
+  .sweepLines { margin-left: 0; }
+  .sweepAsk { flex-wrap: wrap; row-gap: 4px; }
+  .sweepActions { flex-wrap: wrap; p { flex-basis: 100%; } }
   .searchBox input { width: 110px; }
 }

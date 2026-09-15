@@ -62,8 +62,12 @@ Result: 141 candidates, **125 selected, about 1 in 6** (was 145 selected, 1 in 5
 
 ## Keyboard and size
 
-Tab through rows, Space toggles keep, Enter sweeps from the button, Escape closes the sheet. Works
-at 390 px wide. Focus is visible everywhere.
+One tab stop per History row (16 September). Up and Down walk the rows, Enter or Space opens the
+row menu with focus on its first live item, Up and Down move through the items, Escape hands focus
+back to the row. A swept row hands focus to its neighbour before it leaves. The three-dot stays for
+the mouse. On the card: Tab, Space, Enter, Escape. Works at 390 px wide: the tab strip and the ask
+row wrap, the restore line sits above the buttons, the cell's date column widens and Restore is
+always shown, the three ghost icons go and the three-dot stays. Focus is visible everywhere.
 
 ## Data
 

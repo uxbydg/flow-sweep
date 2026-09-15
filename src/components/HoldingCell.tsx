@@ -44,7 +44,7 @@ export function HoldingCell({ items, byId, reasons, now, onRestore }: Props) {
                 const t = toDate(e.timestamp).getTime()
                 const r = reasons.get(it.id)
                 return (
-                  <motion.div key={it.id} className={s.row} layout="position"
+                  <motion.div key={it.id} className={s.row} data-cell layout="position"
                     initial={visible ? { opacity: 0 } : false} animate={{ opacity: 1 }}
                     exit={visible ? { opacity: 0, x: 12, transition: { duration: .2 } } : undefined}>
                     <span className={s.time}>{shortDate(t)}, {flowTime(t)}</span>

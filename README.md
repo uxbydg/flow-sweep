@@ -65,14 +65,15 @@ control, Empty now, sits behind Flow's own confirm, and Flow's coral is spent on
   the row says so. The rest fail.
 - Flow's frame redrawn by hand, including four sidebar glyphs with no Lucide twin, drawn on Lucide's
   grid so they sit in the same family.
-- Keyboard: Tab, Space, Enter, and Escape on the card, the menu, and the dialogs; a visible amber
-  focus ring, Flow's own. Reduced motion honoured by both the CSS and Motion.
+- Keyboard: one tab stop per History row, arrows between rows, Enter opens the row menu with focus
+  inside it, Escape hands focus back; Tab, Space, Enter, and Escape on the card and the dialogs; a
+  visible amber focus ring, Flow's own. Reduced motion honoured by both the CSS and Motion.
+- Phone width (390 px): the card, the cell, the menu, and search all fit with no sideways scroll.
 
 ## What is not built
 
 The sidebar, the banner, the stats card, Play, Copy, Flag, Undo AI edit, Delete transcript, and
-Extract audio are drawn, not wired. History rows are not yet focusable. The narrow layout is
-untested. There is no Storybook and no Lottie; nothing in the concept called for a baked animation.
+Extract audio are drawn, not wired. There is no Storybook and no Lottie; nothing in the concept called for a baked animation.
 Flow's auto-delete setting is respected in the spec, not in the code, because the concept cannot
 read Flow's settings. Light only, because Flow's desktop app is.
 
