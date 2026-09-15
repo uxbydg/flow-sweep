@@ -35,6 +35,14 @@ progress log at the bottom).
    leaving-today reminder card under the stats.
 2. **Say go on the public repo + Vercel.** One push, per the standing rule.
 
+### Definition of done
+A stranger grades it in two minutes from one URL and one paragraph: (1) the public build runs the
+whole loop on sample data with no instructions and no console errors; (2) it survives keyboard-only,
+390 px, reduced motion, ships nothing of Flow's and nothing private; (3) this README is the write-up;
+(4) essay paragraph, CLAIMS.md row, resume link exist. Then one push. Not in scope: threshold slider,
+wiring the drawn menu items, mobile history, dark mode. Triage for new notes: does it change what
+the stranger sees in two minutes?
+
 ### Next steps, in order
 1. **390 px pass.** The CSS exists (`@media (max-width: 760px)`) but is unverified: Chrome would not
    resize below its minimum in the extension. Check with devtools device mode.
