@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import { motion } from 'motion/react'
 import s from '../App.module.scss'
 import type { Candidate, Reason, Summary } from '../data/types.ts'
 import { textOf, appLabel } from '../sweep/detect.ts'
@@ -26,7 +25,7 @@ export function SweepView({ cands, sum, selected, setMany, onSweep, onClose }: P
   const oneIn = Math.max(2, Math.round(1 / Math.max(sum.share, 0.01)))
 
   return (
-    <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .2, ease: [.2, .8, .2, 1] }}>
+    <div className={s.enter}>
       <p className={s.lead}>
         You have <Count n={sum.empty} i={0} /> empty transcripts, <Count n={sum.cutoff} i={1} /> that cut off
         mid-thought, and <Count n={sum.flagged} i={2} /> you said to drop. That's about <b>1 in every {oneIn}</b>.
@@ -75,7 +74,7 @@ export function SweepView({ cands, sum, selected, setMany, onSweep, onClose }: P
         <button className={s.chip} onClick={onClose}>Not now</button>
         <button className={s.chip} data-kind="dark" disabled={!chosen.length} onClick={onSweep}>Sweep {chosen.length}</button>
       </div>
-    </motion.div>
+    </div>
   )
 }
 
@@ -85,7 +84,7 @@ function SectionCheck({ all, some, label, onChange }: { all: boolean; some: bool
   return <input ref={ref} type="checkbox" className={s.check} style={{ marginTop: 0 }} checked={all} aria-label={label} onChange={e => onChange(e.target.checked)} />
 }
 
-// counts settle in sequence, not at once
+// counts settle in sequence, not at once (CSS, so it cannot get stuck and reduced motion turns it off)
 function Count({ n, i }: { n: number; i: number }) {
-  return <motion.b initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .15 + i * .14, duration: .3 }}>{n}</motion.b>
+  return <b className={s.count} style={{ animationDelay: `${.15 + i * .14}s` }}>{n}</b>
 }
