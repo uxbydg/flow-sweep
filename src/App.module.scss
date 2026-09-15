@@ -1,12 +1,13 @@
 // ---------- window ----------
 .window { min-height: 100%; display: grid; grid-template-columns: 170px 1fr; grid-template-rows: 40px 1fr; padding: 0 8px 8px 0; }
-.titlebar { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; padding: 0 8px 0 14px; color: var(--ink-2); }
+.titlebar { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; padding: 0 8px 0 14px; color: var(--ink-2); position: sticky; top: 0; z-index: 8; background: var(--chrome); }
 .lights { display: flex; gap: 7px; margin-right: 18px;
   i { width: 11px; height: 11px; border-radius: 50%; background: #FF5F57; &:nth-child(2) { background: #FEBC2E; } &:nth-child(3) { background: #28C840; } } }
 .titleSpacer { flex: 1; }
 
 // ---------- sidebar ----------
-.sidebar { display: flex; flex-direction: column; padding: 4px 10px 10px; gap: 1px; }
+// pinned to the window like Flow's, so the footer four are always in view
+.sidebar { display: flex; flex-direction: column; padding: 4px 10px 10px; gap: 1px; position: sticky; top: 40px; align-self: start; height: calc(100vh - 48px); }
 .brand { display: flex; align-items: center; gap: 6px; padding: 6px 6px 18px; font-weight: 650; font-size: 17px; letter-spacing: -.01em;
   em { font-style: normal; font-size: 11px; font-weight: 500; background: var(--pro); border-radius: 6px; padding: 2px 6px; } }
 .nav { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: var(--r); font-size: 13px; color: var(--ink);
@@ -27,7 +28,7 @@
   span { display: inline-block; background: #F1EFEA; color: var(--ink); border-radius: var(--r-sm); padding: 5px 12px; font-size: 12px; font-weight: 500; } }
 
 // ---------- right column ----------
-.aside { display: flex; flex-direction: column; gap: 12px; position: sticky; top: 16px; }
+.aside { display: flex; flex-direction: column; gap: 12px; position: sticky; top: 56px; }
 .stats { background: var(--surface); border-radius: var(--r-lg); border: 1px solid var(--line); overflow: hidden; }
 .statsTop { padding: 18px 20px 14px; display: grid; gap: 6px; border-bottom: 1px solid var(--line);
   div { display: flex; align-items: baseline; gap: 6px; font-size: 13px; }
@@ -68,7 +69,7 @@
   background: #1A1A1A; color: #fff; font-size: 11px; font-weight: 500; line-height: 1; white-space: nowrap; padding: 7px 9px; border-radius: var(--r-sm); pointer-events: none; z-index: 5; }
 
 // ---------- history ----------
-.bar { position: sticky; top: 0; z-index: 4; background: var(--page); display: flex; align-items: center; gap: 6px; padding: 8px 0 8px; min-height: 44px; }
+.bar { position: sticky; top: 40px; z-index: 4; background: var(--page); display: flex; align-items: center; gap: 6px; padding: 8px 0 8px; min-height: 44px; }
 .label { font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--label); margin: 0; }
 .barSpacer { flex: 1; }
 // Sits in the empty quadrant below the broom's handle, never on the glyph.
