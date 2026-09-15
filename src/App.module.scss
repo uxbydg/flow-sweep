@@ -41,13 +41,10 @@
     &::after { content: ""; position: absolute; inset: 0 55% 0 0; background: #7B4FC0; } } }
 
 // ---------- reminder ----------
-.reminder { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px 16px 14px 18px; position: relative; }
-.reminderHead { display: flex; align-items: flex-start; gap: 8px; margin: 0 0 6px;
-  h3 { margin: 0; font-size: 13px; font-weight: 600; line-height: 1.4; flex: 1; }
-  em { font-style: normal; color: var(--coral-ink); } }
-.reminderList { margin: 0 0 12px; padding: 0; list-style: none; font-size: 12px; color: var(--ink-2); display: grid; gap: 1px;
-  li { display: flex; justify-content: space-between; } b { font-weight: 500; color: var(--ink); } }
-.reminderActions { display: flex; gap: 6px; }
+// the reminder reuses .stats / .statsTop / .voice wholesale; only the close and the actions are its own
+.reminder { position: relative; h3 em { font-style: normal; color: var(--coral-ink); } }
+.reminder .reminderClose { position: absolute; top: 8px; right: 8px; }
+.reminderActions { display: flex; gap: 6px; margin-top: 10px; }
 
 // ---------- buttons ----------
 .chip { border: 0; background: var(--line); border-radius: var(--r-sm); padding: 5px 11px; font-size: 12px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
