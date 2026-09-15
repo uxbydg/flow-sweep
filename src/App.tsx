@@ -78,12 +78,13 @@ export default function App() {
 
   // Flow's search spins for a moment after every keystroke, then the list is just the matches.
   useEffect(() => {
-    if (!q && !filterBlank) return
+    if (!q) return
     setSearching(true)
     const id = window.setTimeout(() => setSearching(false), 450)
     return () => window.clearTimeout(id)
-  }, [q, filterBlank])
+  }, [q])
   const showBlank = () => { setSweepOpen(false); setQ(''); setSearchOpen(false); setFilterBlank(true); window.scrollTo({ top: 0 }) }
+  // Flow's search matches text only, so this set is a view like the holding cell, not a search token.
   const clearSearch = () => { setQ(''); setFilterBlank(false); setSearchOpen(false) }
 
   // Selected = the classifier's default unless the person said otherwise.
@@ -140,10 +141,10 @@ export default function App() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape' || confirmEmpty) return
-      if (sweepOpen) setSweepOpen(false); else if (view !== 'history') setView('history')
+      if (sweepOpen) setSweepOpen(false); else if (filterBlank) setFilterBlank(false); else if (view !== 'history') setView('history')
     }
     window.addEventListener('keydown', onKey); return () => window.removeEventListener('keydown', onKey)
-  }, [view, sweepOpen, confirmEmpty])
+  }, [view, sweepOpen, filterBlank, confirmEmpty])
 
   const firstDay = visible[0] ? dayLabel(toDate(visible[0].timestamp).getTime(), t) : 'Today'
 
@@ -159,7 +160,12 @@ export default function App() {
             <Banner />
 
             <div className={s.bar}>
-              {view === 'cell' ? (
+              {filterBlank ? (
+                <>
+                  <button className={s.cellBack} onClick={clearSearch}><ArrowLeft size={15} />History</button>
+                  <h2 className={s.cellTitle}>Came back blank · {visible.length}</h2>
+                </>
+              ) : view === 'cell' ? (
                 <>
                   <button className={s.cellBack} onClick={() => setView('history')}><ArrowLeft size={15} />History</button>
                   <h2 className={s.cellTitle}>Swept · {swept.length}</h2>
@@ -180,14 +186,7 @@ export default function App() {
                       Swept · {swept.length}
                     </button>
                   )}
-                  {filterBlank ? (
-                    // a predetermined search: the field holds the filter, and × clears it like any search
-                    <span className={s.searchBox}>
-                      {searching ? <i className={s.spinner} aria-label="Searching" /> : <Search size={16} />}
-                      <span className={s.token}>Came back blank</span>
-                      <button className={s.clear} aria-label="Clear" onClick={clearSearch}><X size={12} /></button>
-                    </span>
-                  ) : searchOpen ? (
+                  {searchOpen ? (
                     <label className={s.searchBox}>
                       {searching ? <i className={s.spinner} aria-label="Searching" /> : <Search size={16} />}
                       <input autoFocus placeholder="Search" value={q} onChange={e => setQ(e.target.value)} aria-label="Search transcripts"
@@ -221,7 +220,7 @@ export default function App() {
             )}
             {view === 'cell'
               ? <HoldingCell items={swept} byId={byId} reasons={reasonOf} now={t} onRestore={restore} />
-              : <HistoryList entries={visible} now={t} onSweepOne={sweepOne} onRetry={id => retry([id])} retrying={retrying} />}
+              : <HistoryList key={filterBlank ? 'blank' : 'all'} entries={visible} now={t} onSweepOne={sweepOne} onRetry={id => retry([id])} retrying={retrying} />}
             {view === 'history' && (
               <p className={s.more}>{live.length} transcripts · {usingRealData ? 'real history, local only' : 'sample data'}</p>
             )}

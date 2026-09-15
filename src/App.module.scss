@@ -81,7 +81,6 @@
 // Flow's search spinner: a thin ring with a gap, turning in place of the magnifier
 @keyframes spin { to { transform: rotate(360deg); } }
 .spinner { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid #C9C7C0; border-top-color: transparent; animation: spin .8s linear infinite; flex: none; margin: 0 1px; }
-.token { font-size: 13px; color: var(--ink); padding: 3px 0; white-space: nowrap; }
 .clear { border: 0; background: transparent; color: var(--mut); width: 18px; height: 18px; display: inline-grid; place-items: center; border-radius: 50%; cursor: pointer; &:hover { color: var(--ink); background: var(--line); } }
 .filterNote { margin: 4px 0 12px; font-size: 13px; color: var(--ink-2); }
 
