@@ -75,7 +75,8 @@ export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose, onS
       {doubtful.length > 0 && (
         <>
           <div className={s.sweepAsk}>
-            <h4>Are these accidents too?</h4>
+            {/* the same ratio the tabs carry, so the tabs plus this line add up to the button */}
+            <h4>Are these accidents too? <small>{doubtOn}/{doubtful.length}</small></h4>
             <label className={s.selectAll}>
               <input type="checkbox" className={s.check} checked={doubtOn === doubtful.length} aria-label="Select all"
                 onChange={e => setMany(doubtful.map(c => c.entry.id), e.target.checked)} />Select all
