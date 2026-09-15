@@ -55,10 +55,17 @@ export default function App() {
     // ?demo=reminder seeds a batch that leaves tonight, on top of anything already swept.
     if (demoReminder && !items.some(it => leavesOn(it) === startOfDay(clock()))) {
       const cands = detect(allEntries).filter(c => !OPT_IN.includes(c.reason) && c.confidence >= DEFAULT_THRESHOLD)
-      const take = (r: Reason, n: number) => cands.filter(c => c.reason === r).slice(0, n)
+      // Works from any state: unswept rows first; if a reason runs short (after a full sweep, say),
+      // rows already in the cell are back-dated instead, so the demo never comes up empty.
       const have = new Set(items.map(it => it.id))
-      items = [...items, ...[...take('empty', 8), ...take('cutoff', 3), ...take('flagged', 1)]
-        .filter(c => !have.has(c.entry.id)).map(c => ({ id: c.entry.id, sweptAt: clock() - HOLD_DAYS * DAY }))]
+      const reasonOfId = new Map(cands.map(c => [c.entry.id, c.reason]))
+      const seedAt = clock() - HOLD_DAYS * DAY
+      for (const [r, n] of [['empty', 8], ['cutoff', 3], ['flagged', 1]] as [Reason, number][]) {
+        const fresh = cands.filter(c => c.reason === r && !have.has(c.entry.id)).slice(0, n)
+        items = [...items, ...fresh.map(c => ({ id: c.entry.id, sweptAt: seedAt }))]
+        let short = n - fresh.length
+        items = items.map(it => short > 0 && reasonOfId.get(it.id) === r && it.sweptAt !== seedAt ? (short--, { ...it, sweptAt: seedAt }) : it)
+      }
     }
     return items
   })
@@ -246,7 +253,7 @@ export default function App() {
               // slide with it instead of jumping
               <div className={s.reveal} data-open={sweepOpen} inert={!sweepOpen}>
                 <div className={s.revealInner}>
-                  <SweepCard cands={cands} sum={sum} selected={selected} setMany={setMany} onSweep={sweep} onClose={() => setSweepOpen(false)}
+                  <SweepCard cands={cands} sum={sum} selected={selected} setMany={setMany} onSweep={sweep} onClose={() => { setSweepOpen(false); setChoices(new Map()) }}
                     onShowBlank={showBlank} />
                 </div>
               </div>

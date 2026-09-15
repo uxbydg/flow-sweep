@@ -107,7 +107,7 @@
   svg { color: var(--ink); flex: none; }
   &:hover { background: var(--hover); }
   &[data-kind="danger"] { color: var(--coral); svg { color: var(--coral); } } // Flow's exact coral for the text too (theirs, not the darker ink variant)
-  &[disabled] { cursor: default; &:hover { background: transparent; } } }
+  &[disabled] { cursor: default; opacity: .45; &:hover { background: transparent; } } } // drawn, not wired: looks it
 .more { text-align: center; padding: 18px; color: var(--mut); font-size: 12px; }
 
 // ---------- sweep card ----------
@@ -128,7 +128,7 @@
 .tab { border: 0; background: transparent; padding: 6px 0 9px; margin-bottom: -1px; font-size: 13px; color: var(--ink-2); cursor: pointer; border-bottom: 2px solid transparent; display: inline-flex; align-items: baseline; gap: 6px; white-space: nowrap;
   small { font-size: 11px; color: var(--mut); font-variant-numeric: tabular-nums; }
   &:hover { color: var(--ink); }
-  &[aria-selected="true"] { color: var(--ink); font-weight: 600; border-bottom-color: var(--ink); } }
+  &[aria-expanded="true"] { color: var(--ink); font-weight: 600; border-bottom-color: var(--ink); } }
 .cardTabs { margin: 2px 0 0 24px; gap: 24px; .tab { padding: 8px 0 11px; font-size: 13px; } }
 // Flow's pulse while a transcript is retried: a grey bar where the text will go
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }

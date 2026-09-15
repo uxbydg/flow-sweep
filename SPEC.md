@@ -62,7 +62,7 @@ Result: 141 candidates, **125 selected, about 1 in 6** (was 145 selected, 1 in 5
 
 ## Keyboard and size
 
-One tab stop per History row (16 September). Up and Down walk the rows, Enter or Space opens the
+One tab stop per History row (15 September). Up and Down walk the rows, Enter or Space opens the
 row menu with focus on its first live item, Up and Down move through the items, Escape hands focus
 back to the row. A swept row hands focus to its neighbour before it leaves. The three-dot stays for
 the mouse. On the card: Tab, Space, Enter, Escape. Works at 390 px wide: the tab strip and the ask
@@ -92,7 +92,7 @@ Never cut: review before sweep, the Swept place with restore, real data locally.
 - Swept rows leave History at once, stay restorable for 7 days, then leave for good (in the concept:
   a local "gone" list; nothing is deleted from Flow).
 - **Empty now** in the holding cell, for anyone who wants them gone today, behind Flow's own confirm.
-- **Blank rows fold into one line per day (16 September).** "N empty transcripts. Show them" with its
+- **Blank rows fold into one line per day (15 September).** "N empty transcripts. Show them" with its
   own Restore N; Show them unfolds that day's blanks under the line. Nobody reads "No text" a hundred
   times to decide what to get back, so the rows with words are what the cell shows. The grouping by
   leave day stays: that is what makes the 7-day promise legible.

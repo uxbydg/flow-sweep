@@ -1,7 +1,7 @@
 # Transcript Sweep
 
-A concept for Wispr Flow's History view. Not affiliated with Wispr; Flow's chrome is reproduced for
-fidelity, and nothing of Flow's ships in this repo.
+A concept for Wispr Flow's History view. Not affiliated with Wispr. Flow's chrome, its mark included,
+is redrawn by hand for fidelity; no file of Flow's (logo, font, Lottie) ships in this repo.
 
 One screen, one action: find the transcripts that are almost certainly accidents, show them with the
 reason, sweep them in one motion, and keep them somewhere they can come back from. Built against my
@@ -89,7 +89,7 @@ mid-word, and ones I plainly did not need, and I wanted a way to clean them up. 
 not the only one.
 
 This is my first React and TypeScript build, paired with Claude Code, across four working sessions
-from 12 to 16 September 2026. I came up with the idea, laid out the conditions and the rules for
+between 12 and 15 September 2026. I came up with the idea, laid out the conditions and the rules for
 what counts as an accident, and decided how the sweep looks and moves. I never opened Figma. I took
 screenshots of Flow and we matched the build against them on proof sheets, then kept iterating
 until it felt like part of Flow's own design language. The model wrote most of the code and

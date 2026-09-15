@@ -95,6 +95,7 @@ export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose, onS
             <h4>Are these accidents too? <small>{doubtOn} of {doubtful.length} will go</small></h4>
             <label className={s.selectAll}>
               <input type="checkbox" className={s.check} checked={doubtOn === doubtful.length} aria-label="Sweep all of these"
+                ref={el => { if (el) el.indeterminate = doubtOn > 0 && doubtOn < doubtful.length }}
                 onChange={e => setMany(doubtful.map(c => c.entry.id), e.target.checked)} />Sweep all
             </label>
           </div>
