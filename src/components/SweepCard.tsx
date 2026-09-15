@@ -38,7 +38,7 @@ export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose, onS
     <section className={s.sweepCard} aria-labelledby="sweepTitle">
       <div className={s.sweepHead}>
         <span className={s.sweepMark}><Broom size={12} strokeWidth={2.25} /></span>
-        <h3 id="sweepTitle" className={s.sweepTitle}>Flow will sweep <b>{decidedOn}</b> transcripts.</h3>
+        <h3 id="sweepTitle" className={s.sweepTitle}><b>{decided.length}</b> transcripts look like accidents.</h3>
       </div>
 
       {/* Flow's tab strip: the breakdown, and each tab opens its own rows so every one can be seen and kept */}
@@ -47,7 +47,7 @@ export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose, onS
           const on = rows.filter(selected).length
           return (
             <button key={r} role="tab" className={s.tab} aria-selected={open === r} aria-controls="sweepRows" onClick={() => setOpen(o => o === r ? null : r)}>
-              {REASON_LABEL[r]}<small data-partial={on !== rows.length}>{on === rows.length ? rows.length : `${on} of ${rows.length}`}</small>
+              {REASON_LABEL[r]}<small data-partial={on !== rows.length}>{on}/{rows.length}</small>
             </button>
           )
         })}
@@ -59,7 +59,7 @@ export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose, onS
             <input type="checkbox" className={s.check} checked={shownOn === shown.rows.length} aria-label={`Select all ${REASON_LABEL[shown.r]}`}
               onChange={e => setMany(shown.rows.map(c => c.entry.id), e.target.checked)} />
             <span className={s.sectionCount}>{shownOn} of {shown.rows.length} selected</span>
-            <span className={s.confHead}>Sure it's an accident</span>
+            <span className={s.confHead}>Accident percentage</span>
           </div>
           {shown.rows.map(c => (
             <label key={c.entry.id} className={s.allRow}>

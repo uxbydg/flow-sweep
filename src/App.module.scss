@@ -141,7 +141,7 @@
 .allHead { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 8px 0 4px;
   .check { margin: 0; } .sectionCount { font-size: 12px; color: var(--ink-2); } }
 .confHead { font-size: 11px; color: var(--ink-2); text-align: right; }
-.tab small[data-partial="true"] { color: var(--ink-2); }
+.tab small { font-variant-numeric: tabular-nums; } .tab small[data-partial="true"] { color: var(--ink-2); }
 .allRow { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 8px; align-items: start; padding: 5px 0; border-top: 1px solid var(--line); cursor: pointer;
   .check { margin-top: 1px; } .candText, .candEmpty { font-size: 12px; } }
 .sweepAsk { display: flex; align-items: center; margin: 14px 0 8px; h4 { margin: 0; font-size: 13px; font-weight: 600; flex: 1; } }
