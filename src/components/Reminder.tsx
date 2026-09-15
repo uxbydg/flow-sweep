@@ -12,21 +12,24 @@ interface Props {
   onDismiss: () => void
 }
 
-// Built on the stats card directly above it: serif number left, label right, one row per section,
-// a hairline, then a titled block with the sentence and the controls. Coral only on "tonight".
+// Reads top to bottom on its own: what is happening, how many, made of what, then the consequence
+// and the two choices. The parts are the stats card's (serif figure, label, hairline, titled block).
 export function Reminder({ counts, total, onReview, onKeep, onDismiss }: Props) {
   return (
     <motion.section className={`${s.stats} ${s.reminder}`} aria-labelledby="reminderTitle"
       initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: .24, ease: [.2, .8, .2, 1] }}>
-      <button className={`${s.icon} ${s.reminderClose}`} aria-label="Dismiss until tomorrow" onClick={onDismiss}><X size={14} /></button>
-      <div className={s.statsTop}>
-        {(Object.entries(counts) as [Reason, number][]).map(([r, n]) => (
-          <div key={r}><b>{n}</b> {REASON_LABEL[r].toLowerCase()}</div>
-        ))}
+      <div className={s.reminderTop}>
+        <h3 id="reminderTitle">Leaving for good <em>tonight</em></h3>
+        <button className={`${s.icon} ${s.reminderClose}`} aria-label="Dismiss until tomorrow" onClick={onDismiss}><X size={14} /></button>
+        <div className={s.reminderStat}><b>{total}</b> swept {total === 1 ? 'transcript' : 'transcripts'}</div>
+        <p className={s.reminderMeta}>
+          {(Object.entries(counts) as [Reason, number][]).map(([r, n], i) => (
+            <span key={r}>{i > 0 && ' · '}{REASON_LABEL[r]} {n}</span>
+          ))}
+        </p>
       </div>
       <div className={s.voice}>
-        <h3 id="reminderTitle">Leaving for good <em>tonight</em></h3>
-        <p>{total} swept {total === 1 ? 'transcript reaches' : 'transcripts reach'} 7 days.</p>
+        <p>Swept 7 days ago. Anything you don't restore is deleted at midnight.</p>
         <div className={s.reminderActions}>
           <button className={s.chip} data-kind="dark" onClick={onReview}>Review</button>
           <button className={s.chip} onClick={onKeep}>Keep them</button>
