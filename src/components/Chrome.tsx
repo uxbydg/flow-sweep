@@ -21,8 +21,10 @@ const Notetaker = (p: IconProps) => <Glyph {...p}><circle cx="12" cy="12" r="10"
 const Dictionary = (p: IconProps) => <Glyph {...p}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /><path d="M15 9.5v6a3 3 0 0 1-6 0V9a2 2 0 0 1 4 0v6" /></Glyph>
 // a large T and a small one
 const Style = (p: IconProps) => <Glyph {...p}><path d="M3 5h10M8 5v14" /><path d="M14 11h7M17.5 11v8" /></Glyph>
-// Flow's mark: five rounded bars, short, tall, tallest, tall, short (from Daniel's crop, 15 Sep)
-const FlowMark = (p: IconProps) => <Glyph strokeWidth={2.6} {...p}><path d="M4 9.5v5M8 6v12M12 3.5v17M16 6v12M20 9.5v5" /></Glyph>
+// Flow's mark: five rounded bars, tall, short, middle, short, tall; the 2nd and 4th sit lower.
+// Measured from Daniel's capture (ref/flow-history-home.png) on 15 Sep, not eyeballed: the first
+// drawing was a symmetric sound wave and read wrong beside the real one on a proof sheet.
+const FlowMark = (p: IconProps) => <Glyph strokeWidth={2.75} {...p}><path d="M3.3 3.4v17.2M7.6 12.4v5.7M12 6.9v9.7M16.4 12.9v5.2M20.7 3.4v17.2" /></Glyph>
 // a note with two lines and a folded bottom-right corner
 const Scratchpad = (p: IconProps) => <Glyph {...p}><path d="M5 3h14a2 2 0 0 1 2 2v9l-7 7H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" /><path d="M21 14h-5a2 2 0 0 0-2 2v5" /><path d="M8 9h8M8 13h5" /></Glyph>
 
