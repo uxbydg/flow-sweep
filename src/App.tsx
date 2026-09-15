@@ -90,7 +90,7 @@ export default function App() {
   }, [q])
   // Flow's search matches text only, so this set is a view like the holding cell, not a search token.
   // It snapshots its rows on entry so a transcript that comes back stays in view, with its words.
-  const showBlank = () => { setSweepOpen(false); setQ(''); setSearchOpen(false); setBlankIds(new Set(retryIds)); window.scrollTo({ top: 0 }) }
+  const showBlank = () => { setQ(''); setSearchOpen(false); setBlankIds(new Set(retryIds)); window.scrollTo({ top: 0 }) }
   const clearSearch = () => { setQ(''); setBlankIds(null); setSearchOpen(false) }
   // still blank: a recovered row stays in the view with its words but leaves the count
   const blankLeft = useMemo(() => visible.filter(e => retryIds.has(e.id)), [visible, retryIds])
@@ -110,7 +110,7 @@ export default function App() {
     setChoices(new Map())
     setSweepOpen(false)
     // The card folds first, then the rows lift out of the list beneath where it was.
-    window.setTimeout(() => setSwept(prev => [...chosen, ...prev]), 80)
+    window.setTimeout(() => setSwept(prev => [...chosen, ...prev]), 240)
   }
   // Flow's retry, as captured: the row pulses while it works, then a toast reports the result.
   // The concept holds no audio, so every retry ends the way Flow's did on 14 Sep: it fails.
@@ -227,9 +227,15 @@ export default function App() {
                 </button>
               </p>
             )}
-            {view === 'history' && sweepOpen && (
-              <SweepCard cands={cands} sum={sum} selected={selected} setMany={setMany} onSweep={sweep} onClose={() => setSweepOpen(false)}
-                onShowBlank={showBlank} />
+            {view === 'history' && !filterBlank && (
+              // always mounted: opening and closing animate the card's height, so the rows below
+              // slide with it instead of jumping
+              <div className={s.reveal} data-open={sweepOpen} inert={!sweepOpen}>
+                <div className={s.revealInner}>
+                  <SweepCard cands={cands} sum={sum} selected={selected} setMany={setMany} onSweep={sweep} onClose={() => setSweepOpen(false)}
+                    onShowBlank={showBlank} />
+                </div>
+              </div>
             )}
             {view === 'cell'
               ? <HoldingCell items={swept} byId={byId} reasons={reasonOf} now={t} onRestore={restore} />

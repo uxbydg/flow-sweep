@@ -113,8 +113,14 @@
 // ---------- sweep card ----------
 @keyframes rise { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 .enter { animation: rise .2s cubic-bezier(.2, .8, .2, 1) both; }
+// the fold: height runs 0 → auto through a grid row, the card fades and settles a few px, one easing, no jump
+.reveal { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .28s cubic-bezier(.2, .8, .2, 1);
+  &[data-open="true"] { grid-template-rows: 1fr; }
+  &[data-open="true"] .revealInner { opacity: 1; transform: none; transition-delay: .04s; }
+  &[data-open="true"] .sweepCard { margin-bottom: 16px; } }
+.revealInner { min-height: 0; overflow: hidden; opacity: 0; transform: translateY(-4px); transition: opacity .2s ease, transform .24s cubic-bezier(.2, .8, .2, 1); }
 // Flow's card surface (the stats card), unfolding above the list only while the broom is pressed
-.sweepCard { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px 18px 14px; margin: 0 0 16px; }
+.sweepCard { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px 18px 14px; margin: 0; transition: margin .28s cubic-bezier(.2, .8, .2, 1); }
 .sweepHead { display: flex; align-items: center; gap: 8px; margin: 0 0 4px; }
 .sweepMark { width: 20px; height: 20px; border-radius: 50%; background: var(--teal); color: #fff; display: inline-grid; place-items: center; flex: none; }
 .sweepTitle { margin: 0; font-size: 14px; font-weight: 600; line-height: 1.4; b { font-weight: 600; color: var(--teal); font-variant-numeric: tabular-nums; } }

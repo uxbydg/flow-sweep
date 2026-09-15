@@ -35,7 +35,7 @@ export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose, onS
   const shownOn = shown ? shown.rows.filter(selected).length : 0
 
   return (
-    <section className={`${s.sweepCard} ${s.enter}`} aria-labelledby="sweepTitle">
+    <section className={s.sweepCard} aria-labelledby="sweepTitle">
       <div className={s.sweepHead}>
         <span className={s.sweepMark}><Broom size={12} strokeWidth={2.25} /></span>
         <h3 id="sweepTitle" className={s.sweepTitle}>Flow will sweep <b>{decidedOn}</b> transcripts.</h3>
