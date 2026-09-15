@@ -6,7 +6,8 @@ import sample from './history.sample.json'
 const privateMods = import.meta.glob('./history.private.json', { eager: true, import: 'default' }) as Record<string, Entry[]>
 const privateData = Object.values(privateMods)[0]
 
-export const entries: Entry[] = (privateData ?? (sample as Entry[]))
+// VITE_SAMPLE=1 forces the synthetic set even when the private export is on disk (to see the public build).
+export const entries: Entry[] = ((import.meta.env.VITE_SAMPLE ? undefined : privateData) ?? (sample as Entry[]))
   .slice()
   .sort((a, b) => (a.timestamp < b.timestamp ? 1 : -1))
-export const usingRealData = Boolean(privateData)
+export const usingRealData = Boolean(privateData) && !import.meta.env.VITE_SAMPLE
