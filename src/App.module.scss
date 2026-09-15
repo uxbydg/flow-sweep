@@ -106,7 +106,7 @@
 .menuItem { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; background: transparent; text-align: left; padding: 7px 8px; border-radius: var(--r-sm); font-size: 13px; color: var(--ink); cursor: pointer; white-space: nowrap;
   svg { color: var(--ink); flex: none; }
   &:hover { background: var(--hover); }
-  &[data-kind="danger"] { color: var(--coral-ink); svg { color: var(--coral); } }
+  &[data-kind="danger"] { color: var(--coral); svg { color: var(--coral); } } // Flow's exact coral for the text too (theirs, not the darker ink variant)
   &[disabled] { cursor: default; &:hover { background: transparent; } } }
 .more { text-align: center; padding: 18px; color: var(--mut); font-size: 12px; }
 
