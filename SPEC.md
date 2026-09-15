@@ -92,6 +92,10 @@ Never cut: review before sweep, the Swept place with restore, real data locally.
 - Swept rows leave History at once, stay restorable for 7 days, then leave for good (in the concept:
   a local "gone" list; nothing is deleted from Flow).
 - **Empty now** in the holding cell, for anyone who wants them gone today, behind Flow's own confirm.
+- **Blank rows fold into one line per day (16 September).** "N empty transcripts. Show them" with its
+  own Restore N; Show them unfolds that day's blanks under the line. Nobody reads "No text" a hundred
+  times to decide what to get back, so the rows with words are what the cell shows. The grouping by
+  leave day stays: that is what makes the 7-day promise legible.
 - **Should respect Flow's auto-delete setting** (not built: the concept cannot read Flow's settings).
   If transcripts auto-delete sooner, swept rows would go on that schedule.
 - **Section-level select** on every Review header (take or leave a whole section). Short replies still

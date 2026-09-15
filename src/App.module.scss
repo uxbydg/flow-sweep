@@ -166,6 +166,9 @@
 .reason { display: block; font-size: 11px; color: var(--mut); margin-top: 1px; }
 .cellEmpty { margin: 40px 0; text-align: center; color: var(--mut); font-size: 13px; }
 .restore { opacity: 0; transition: opacity .12s; }
+// the folded blanks line: always shows its Restore, sits flush with the text column
+.row[data-line] .restore { opacity: 1; }
+.row[data-line] .textLink { color: var(--ink); }
 .row:hover .restore, .restore:focus-visible { opacity: 1; }
 
 // ---------- dialogs ----------
@@ -202,6 +205,7 @@
   .text { max-width: none; }
   // the cell's date is wider than a time, and Restore has no hover to wait for on a phone
   .row[data-cell] { grid-template-columns: 98px minmax(0, 1fr) auto; }
+  .row[data-line] { grid-template-columns: minmax(0, 1fr) auto; .time { display: none; } }
   .restore { opacity: 1; }
   // the card at phone width: strip and ask row wrap, the restore line sits above the buttons
   .sweepCard { padding: 14px 14px 12px; }

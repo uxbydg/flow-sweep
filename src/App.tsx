@@ -130,6 +130,7 @@ export default function App() {
   }
   const sweepOne = (id: string) => setSwept(prev => [{ id, sweptAt: t }, ...prev])
   const restore = (id: string) => setSwept(prev => prev.filter(it => it.id !== id))
+  const restoreMany = (ids: string[]) => { const gone = new Set(ids); setSwept(prev => prev.filter(it => !gone.has(it.id))) }
   const restoreAll = () => { setSwept([]); setView('history') }
   const emptyNow = () => {
     setGone(prev => [...prev, ...swept.map(it => it.id)])
@@ -239,7 +240,7 @@ export default function App() {
               </div>
             )}
             {view === 'cell'
-              ? <HoldingCell items={swept} byId={byId} reasons={reasonOf} now={t} onRestore={restore} />
+              ? <HoldingCell items={swept} byId={byId} reasons={reasonOf} now={t} onRestore={restore} onRestoreMany={restoreMany} />
               : <HistoryList key={filterBlank ? 'blank' : 'all'} entries={visible} now={t} onSweepOne={sweepOne} onRetry={id => retry([id])} retrying={retrying} />}
             {view === 'history' && (
               <p className={s.more}>{live.length} transcripts · {usingRealData ? 'real history, local only' : 'sample data'}</p>

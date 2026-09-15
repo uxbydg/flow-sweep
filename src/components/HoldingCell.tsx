@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import s from '../App.module.scss'
 import type { Entry, Reason, SweptItem } from '../data/types.ts'
@@ -15,11 +15,15 @@ interface Props {
   reasons: Map<string, Reason>
   now: number
   onRestore: (id: string) => void
+  onRestoreMany: (ids: string[]) => void
 }
 
 // Grouped by the day rows LEAVE, not the day they were said: the question here is "how long do I have".
-export function HoldingCell({ items, byId, reasons, now, onRestore }: Props) {
+export function HoldingCell({ items, byId, reasons, now, onRestore, onRestoreMany }: Props) {
   const visible = usePageVisible()
+  // Blank rows fold into one line per day: nobody reads "No text" a hundred times to decide what to
+  // get back. Show them unfolds that day's blanks under the line; the rows with words stay rows.
+  const [shown, setShown] = useState<Set<number>>(new Set())
   const groups = useMemo(() => {
     const m = new Map<number, SweptItem[]>()
     for (const it of items) {
@@ -38,7 +42,21 @@ export function HoldingCell({ items, byId, reasons, now, onRestore }: Props) {
           <h3 className={`${s.label} ${s.dayLabel}`}>{leaveLabel(day, now)} · {rows.length}</h3>
           <div className={s.day}>
             <AnimatePresence initial={false} mode="popLayout">
-              {rows.map(it => {
+              {(() => {
+                const blank = rows.filter(it => !textOf(byId.get(it.id)!))
+                const open = shown.has(day)
+                const ordered = blank.length ? [...(open ? blank : []), ...rows.filter(it => !blank.includes(it))] : rows
+                const line = blank.length > 0 && (
+                  <motion.div key="blank" className={s.row} data-cell data-line layout="position"
+                    initial={visible ? { opacity: 0 } : false} animate={{ opacity: 1 }} exit={visible ? { opacity: 0, x: 12, transition: { duration: .2 } } : undefined}>
+                    <span className={s.time} aria-hidden="true" />
+                    <span className={`${s.text} ${s.rowNote}`}>{blank.length} empty {blank.length === 1 ? 'transcript' : 'transcripts'}.{' '}
+                      <button className={s.textLink} aria-expanded={open} onClick={() => setShown(prev => { const n = new Set(prev); if (open) n.delete(day); else n.add(day); return n })}>{open ? 'Hide' : 'Show them'}</button></span>
+                    <button className={`${s.chip} ${s.restore}`} data-kind="ghost" onClick={() => onRestoreMany(blank.map(it => it.id))}
+                      aria-label={`Restore all ${blank.length} empty transcripts`}><RotateCcw size={13} />Restore {blank.length}</button>
+                  </motion.div>
+                )
+                return [line, ...ordered.map(it => {
                 const e = byId.get(it.id)
                 if (!e) return null
                 const t = toDate(e.timestamp).getTime()
@@ -58,7 +76,8 @@ export function HoldingCell({ items, byId, reasons, now, onRestore }: Props) {
                     </button>
                   </motion.div>
                 )
-              })}
+              })]
+              })()}
             </AnimatePresence>
           </div>
         </motion.section>

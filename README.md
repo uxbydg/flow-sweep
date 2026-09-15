@@ -56,7 +56,8 @@ control, Empty now, sits behind Flow's own confirm, and Flow's coral is spent on
   checkboxes), the doubtful cut-offs as chips with filled meaning "goes", short replies and blank
   recordings as lines, Not now and Sweep.
 - The holding cell inside History, grouped by the day rows leave, with Restore, Restore all, and
-  Empty now.
+  Empty now. Each day's blank rows fold into one line ("101 empty transcripts. Show them", Restore
+  101), so the cell is a list of things worth a second look, not a wall of "No text".
 - The reminder card on day seven, dismissable for the day, with Review and Keep them.
 - The row menu with Sweep transcript added above Delete transcript: the reversible option before
   the irreversible one.
