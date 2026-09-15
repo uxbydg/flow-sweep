@@ -110,7 +110,7 @@ export default function App() {
     setChoices(new Map())
     setSweepOpen(false)
     // The card folds first, then the rows lift out of the list beneath where it was.
-    window.setTimeout(() => setSwept(prev => [...chosen, ...prev]), 270)
+    window.setTimeout(() => setSwept(prev => [...chosen, ...prev]), 285)
   }
   // Flow's retry, as captured: the row pulses while it works, then a toast reports the result.
   // The concept holds no audio, so every retry ends the way Flow's did on 14 Sep: it fails.
