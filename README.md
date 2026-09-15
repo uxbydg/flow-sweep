@@ -11,6 +11,8 @@ own 874 real Flow entries, and published on a synthetic set that matches their d
 
 ## Try it
 
+**Live: [flow-sweep.vercel.app](https://flow-sweep.vercel.app)**
+
 1. Press the broom beside search. A card unfolds: what Flow will sweep, and the one question it has.
 2. Press **Sweep**. The rows lift out of the list.
 3. **Swept · N** appears in the bar. Open it: that is the holding cell, where anything can be restored
