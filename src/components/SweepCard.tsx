@@ -54,13 +54,12 @@ export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose, onS
       </div>
       {shown && (
         <div id="sweepRows" role="tabpanel" className={s.allList}>
+          {/* a table head: the select-all box sits over the row boxes, the column name over the numbers */}
           <div className={s.allHead}>
+            <input type="checkbox" className={s.check} checked={shownOn === shown.rows.length} aria-label={`Select all ${REASON_LABEL[shown.r]}`}
+              onChange={e => setMany(shown.rows.map(c => c.entry.id), e.target.checked)} />
             <span className={s.sectionCount}>{shownOn} of {shown.rows.length} selected</span>
-            <span className={s.confHead}>How sure Flow is it's an accident</span>
-            <label className={s.selectAll}>
-              <input type="checkbox" className={s.check} checked={shownOn === shown.rows.length} aria-label={`Select all ${REASON_LABEL[shown.r]}`}
-                onChange={e => setMany(shown.rows.map(c => c.entry.id), e.target.checked)} />Select all
-            </label>
+            <span className={s.confHead}>Sure it's an accident</span>
           </div>
           {shown.rows.map(c => (
             <label key={c.entry.id} className={s.allRow}>
@@ -103,7 +102,7 @@ export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose, onS
       )}
 
       <div className={s.sweepActions}>
-        <p>Restorable for 7 days.{sum.reply > 0 && decided.filter(c => c.reason === 'reply' && selected(c)).length === 0 && <> {sum.reply} short replies stay.</>}</p>
+        <p>Restorable for 7 days.</p>
         <button className={s.chip} onClick={onClose}>Not now</button>
         <button className={s.chip} data-kind="dark" disabled={!going} onClick={onSweep}>Sweep {going}</button>
       </div>
