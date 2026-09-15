@@ -16,6 +16,7 @@ import { HoldingCell } from './components/HoldingCell.tsx'
 import { Reminder } from './components/Reminder.tsx'
 import { SweepCard } from './components/SweepCard.tsx'
 import { Confirm } from './components/Dialogs.tsx'
+import { Toast } from './components/Toast.tsx'
 import { Search, Broom, ArrowLeft, RotateCcw } from './icons.ts'
 
 const DAY = 864e5
@@ -54,6 +55,8 @@ export default function App() {
   const [confirmEmpty, setConfirmEmpty] = useState(false)
   const [choices, setChoices] = useState<Map<string, boolean>>(new Map())
   const [dismissed, setDismissed] = useState<string | null>(loadDismissed)
+  const [retrying, setRetrying] = useState<Set<string>>(new Set())
+  const [toast, setToast] = useState<string | null>(null)
 
   useEffect(() => { saveSwept(swept) }, [swept])
   useEffect(() => { saveGone(gone) }, [gone])
@@ -86,6 +89,17 @@ export default function App() {
     // The card folds first, then the rows lift out of the list beneath where it was.
     window.setTimeout(() => setSwept(prev => [...chosen, ...prev]), 80)
   }
+  // Flow's retry, as captured: the row pulses while it works, then a toast reports the result.
+  // The concept holds no audio, so every retry ends the way Flow's did on 14 Sep: it fails.
+  const retry = (ids: string[]) => {
+    if (!ids.length) return
+    setRetrying(prev => new Set([...prev, ...ids]))
+    ids.forEach((id, i) => window.setTimeout(() => {
+      setRetrying(prev => { const n = new Set(prev); n.delete(id); return n })
+      if (i === ids.length - 1) { setToast('Retry failed. Please try again.'); window.setTimeout(() => setToast(null), 4000) }
+    }, 1600 + i * 350))
+  }
+  const retryIds = cands.filter(c => c.reason === 'retry').map(c => c.entry.id)
   const sweepOne = (id: string) => setSwept(prev => [{ id, sweptAt: t }, ...prev])
   const restore = (id: string) => setSwept(prev => prev.filter(it => it.id !== id))
   const restoreAll = () => { setSwept([]); setView('history') }
@@ -173,11 +187,12 @@ export default function App() {
             </div>
 
             {view === 'history' && sweepOpen && (
-              <SweepCard cands={cands} sum={sum} selected={selected} setMany={setMany} onSweep={sweep} onClose={() => setSweepOpen(false)} />
+              <SweepCard cands={cands} sum={sum} selected={selected} setMany={setMany} onSweep={sweep} onClose={() => setSweepOpen(false)}
+                retrying={retryIds.some(id => retrying.has(id))} onRetry={() => retry(retryIds)} />
             )}
             {view === 'cell'
               ? <HoldingCell items={swept} byId={byId} reasons={reasonOf} now={t} onRestore={restore} />
-              : <HistoryList entries={visible} now={t} onSweepOne={sweepOne} />}
+              : <HistoryList entries={visible} now={t} onSweepOne={sweepOne} onRetry={id => retry([id])} retrying={retrying} />}
             {view === 'history' && (
               <p className={s.more}>{live.length} transcripts · {usingRealData ? 'real history, local only' : 'sample data'}</p>
             )}
@@ -195,6 +210,7 @@ export default function App() {
         </div>
       </div>
 
+      <AnimatePresence>{toast && <Toast key="toast" text={toast} />}</AnimatePresence>
       <AnimatePresence>
         {confirmEmpty && (
           <Confirm key="confirm" title="Empty the holding cell?" body={`${swept.length} swept transcripts will be deleted for good. This cannot be undone.`}

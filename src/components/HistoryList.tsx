@@ -8,10 +8,10 @@ import { Play, Copy, Flag, EllipsisVertical, Undo2, RefreshCw, Broom, Trash2, Fi
 
 const PAGE = 120
 
-interface Props { entries: Entry[]; now: number; onSweepOne: (id: string) => void }
+interface Props { entries: Entry[]; now: number; onSweepOne: (id: string) => void; onRetry: (id: string) => void; retrying: Set<string> }
 
 // Flow's history: a card per day, time on the left, empty transcripts as blank rows.
-export function HistoryList({ entries, now, onSweepOne }: Props) {
+export function HistoryList({ entries, now, onSweepOne, onRetry, retrying }: Props) {
   const [limit, setLimit] = useState(PAGE)
   const sentinel = useRef<HTMLDivElement>(null)
 
@@ -44,7 +44,7 @@ export function HistoryList({ entries, now, onSweepOne }: Props) {
             {day !== days[0] && <h3 className={`${s.label} ${s.dayLabel}`}>{dayLabel(day.t, now)}</h3>}
             <div className={s.day}>
               <AnimatePresence initial={false} mode="popLayout">
-                {day.rows.map((e, i) => <Row key={e.id} e={e} i={i} onSweep={() => onSweepOne(e.id)} />)}
+                {day.rows.map((e, i) => <Row key={e.id} e={e} i={i} onSweep={() => onSweepOne(e.id)} onRetry={() => onRetry(e.id)} retrying={retrying.has(e.id)} />)}
               </AnimatePresence>
             </div>
           </motion.section>
@@ -55,7 +55,7 @@ export function HistoryList({ entries, now, onSweepOne }: Props) {
   )
 }
 
-function Row({ e, i, onSweep }: { e: Entry; i: number; onSweep: () => void }) {
+function Row({ e, i, onSweep, onRetry, retrying }: { e: Entry; i: number; onSweep: () => void; onRetry: () => void; retrying: boolean }) {
   const text = textOf(e)
   const t = toDate(e.timestamp).getTime()
   const [menu, setMenu] = useState(false)
@@ -76,11 +76,11 @@ function Row({ e, i, onSweep }: { e: Entry; i: number; onSweep: () => void }) {
       exit={{ opacity: 0, y: -6, transition: { duration: .22, delay: Math.min(i, 12) * .018, ease: [.4, 0, .2, 1] } }}>
       <span className={s.time}>{flowTime(t)}</span>
       <span className={s.text}>
-        {text || (
+        {retrying ? <span className={s.skeleton} aria-label="Retrying" /> : text || (
           // Flow's own row copy: a dismissed transcription offers Recover; a long recording that
           // came back blank offers Retry (Flow's mobile wording, applied to the desktop row).
           e.status === 'dismissed' ? <span className={s.rowNote}>This transcription was dismissed. <button className={s.textLink} disabled>Recover</button></span>
-          : (e.duration ?? 0) > 30 ? <span className={s.rowNote}>Retry your transcript. <button className={s.textLink} disabled>Retry</button></span>
+          : (e.duration ?? 0) > 30 ? <span className={s.rowNote}>Retry your transcript. <button className={s.textLink} onClick={onRetry}>Retry</button></span>
           : null
         )}
       </span>
@@ -98,7 +98,7 @@ function Row({ e, i, onSweep }: { e: Entry; i: number; onSweep: () => void }) {
             // option before the irreversible one. Only Sweep is live in this concept.
             <div className={s.menu} role="menu">
               <button className={s.menuItem} role="menuitem" disabled><Undo2 size={13} />Undo AI edit</button>
-              <button className={s.menuItem} role="menuitem" disabled><RefreshCw size={13} />Retry transcript</button>
+              <button className={s.menuItem} role="menuitem" onClick={() => { setMenu(false); onRetry() }}><RefreshCw size={13} />Retry transcript</button>
               <button className={s.menuItem} role="menuitem" onClick={() => { setMenu(false); onSweep() }}><Broom size={13} />Sweep transcript</button>
               <button className={s.menuItem} role="menuitem" data-kind="danger" disabled><Trash2 size={13} />Delete transcript</button>
               <button className={s.menuItem} role="menuitem" disabled><FileAudio size={13} />Extract audio</button>

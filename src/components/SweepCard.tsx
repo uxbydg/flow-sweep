@@ -4,7 +4,7 @@ import type { Candidate, Reason, Summary } from '../data/types.ts'
 import { textOf, appLabel } from '../sweep/detect.ts'
 import { ORDER, REASON_LABEL } from '../sweep/labels.ts'
 import { toDate, shortDate, pct } from '../format.ts'
-import { Check } from '../icons.ts'
+import { Broom } from '../icons.ts'
 
 interface Props {
   cands: Candidate[]
@@ -13,6 +13,8 @@ interface Props {
   setMany: (ids: string[], on: boolean) => void
   onSweep: () => void
   onClose: () => void
+  retrying: boolean
+  onRetry: () => void
 }
 
 // Flow decided the obvious ones. Below this line the machine is unsure and a person can disagree.
@@ -20,7 +22,7 @@ export const SURE = 0.9
 
 // The sweep is a card that unfolds above the list when the broom is pressed, and folds away after.
 // Two tiers, read top to bottom: what Flow decided, then the one question it has.
-export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose }: Props) {
+export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose, retrying, onRetry }: Props) {
   const [open, setOpen] = useState<Reason | null>(null)
   // Retry is Flow's own action, so it is a line, not a section. Everything else is a tab.
   const sweepable = cands.filter(c => c.reason !== 'retry')
@@ -36,7 +38,7 @@ export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose }: P
   return (
     <section className={`${s.sweepCard} ${s.enter}`} aria-labelledby="sweepTitle">
       <div className={s.sweepHead}>
-        <span className={s.sweepMark}><Check size={13} strokeWidth={2.5} /></span>
+        <span className={s.sweepMark}><Broom size={12} strokeWidth={2.25} /></span>
         <h3 id="sweepTitle" className={s.sweepTitle}>Flow will sweep <b>{decidedOn}</b> transcripts.</h3>
       </div>
 
@@ -93,7 +95,7 @@ export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose }: P
 
       {sum.retry > 0 && (
         // Flow's words for a transcript that came back blank, not ours.
-        <p className={s.sweepNote}>{sum.retry} transcripts came back blank. <button className={s.textLink} disabled>Retry your transcripts</button></p>
+        <p className={s.sweepNote}>{sum.retry} transcripts came back blank. <button className={s.textLink} disabled={retrying} onClick={onRetry}>{retrying ? 'Retrying…' : 'Retry your transcripts'}</button></p>
       )}
 
       <div className={s.sweepActions}>
