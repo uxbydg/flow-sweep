@@ -74,7 +74,8 @@ control, Empty now, sits behind Flow's own confirm, and Flow's coral is spent on
 ## What is not built
 
 The sidebar, the banner, the stats card, Play, Copy, Flag, Undo AI edit, Delete transcript, and
-Extract audio are drawn, not wired. There is no Storybook and no Lottie; nothing in the concept called for a baked animation.
+Extract audio are drawn, not wired (the stats card's three numbers are counted from the loaded
+history, so they describe the list beneath them; nothing on it is typed in). There is no Storybook and no Lottie; nothing in the concept called for a baked animation.
 Flow's auto-delete setting is respected in the spec, not in the code, because the concept cannot
 read Flow's settings. Light only, because Flow's desktop app is.
 

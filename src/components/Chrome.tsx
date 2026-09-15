@@ -69,13 +69,13 @@ export function Banner() {
   )
 }
 
-export function Stats({ words }: { words: number }) {
+export function Stats({ words, wpm, streak }: { words: number; wpm: number; streak: number }) {
   return (
     <div className={s.stats}>
       <div className={s.statsTop}>
         <div><b>{(words / 1000).toFixed(1)}K</b> total words</div>
-        <div><b>121</b> wpm</div>
-        <div><b>22</b> day streak</div>
+        <div><b>{wpm}</b> wpm</div>
+        <div><b>{streak}</b> day streak</div>
       </div>
       <div className={s.voice}>
         <h3>Your Voice Profile</h3>

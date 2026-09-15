@@ -24,7 +24,19 @@ const RECOVERED_TEXT = 'Okay, go back to the punch list and take the top three i
 const byId = new Map<string, Entry>(allEntries.map(e => [e.id, e]))
 // Reason at classification time, so the holding cell can say why a row was swept.
 const reasonOf = new Map<string, Reason>(detect(allEntries).map(c => [c.entry.id, c.reason]))
-const totalWords = allEntries.reduce((n, e) => n + (textOf(e).match(/\S+/g)?.length ?? 0), 0)
+// The stats card describes the loaded history, whichever one it is: words counted, words per minute
+// over rows that have both words and a recording length, the streak as the run of days ending at
+// the newest row. Nothing on the card is typed in.
+const wordsOf = (e: Entry) => textOf(e).match(/\S+/g)?.length ?? 0
+const totalWords = allEntries.reduce((n, e) => n + wordsOf(e), 0)
+const timed = allEntries.filter(e => wordsOf(e) > 0 && (e.duration ?? 0) > 0)
+const wpm = Math.round(timed.reduce((n, e) => n + wordsOf(e), 0) / (timed.reduce((n, e) => n + (e.duration ?? 0), 0) / 60))
+const streak = (() => {
+  const days = [...new Set(allEntries.map(e => Math.floor(toDate(e.timestamp).getTime() / DAY)))].sort((a, b) => b - a)
+  let n = 0
+  for (let i = 0; i < days.length && days[i] === days[0] - i; i++) n++
+  return n
+})()
 
 export default function App() {
   // The concept's clock: ?day=N moves it forward so the 7-day hold can be seen without waiting.
@@ -248,7 +260,7 @@ export default function App() {
           </div>
 
           <div className={s.aside}>
-            <Stats words={totalWords} />
+            <Stats words={totalWords} wpm={wpm} streak={streak} />
             <AnimatePresence>
               {showReminder && (
                 <Reminder key="reminder" counts={leavingCounts} total={leavingToday.length}
