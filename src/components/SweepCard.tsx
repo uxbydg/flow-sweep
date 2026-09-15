@@ -13,8 +13,7 @@ interface Props {
   setMany: (ids: string[], on: boolean) => void
   onSweep: () => void
   onClose: () => void
-  retrying: boolean
-  onRetry: () => void
+  onShowBlank: () => void
 }
 
 // Flow decided the obvious ones. Below this line the machine is unsure and a person can disagree.
@@ -22,7 +21,7 @@ export const SURE = 0.9
 
 // The sweep is a card that unfolds above the list when the broom is pressed, and folds away after.
 // Two tiers, read top to bottom: what Flow decided, then the one question it has.
-export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose, retrying, onRetry }: Props) {
+export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose, onShowBlank }: Props) {
   const [open, setOpen] = useState<Reason | null>(null)
   // Retry is Flow's own action, so it is a line, not a section. Everything else is a tab.
   const sweepable = cands.filter(c => c.reason !== 'retry')
@@ -94,8 +93,9 @@ export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose, ret
       )}
 
       {sum.retry > 0 && (
-        // Flow's words for a transcript that came back blank, not ours.
-        <p className={s.sweepNote}>{sum.retry} transcriptions came back blank. <button className={s.textLink} disabled={retrying} onClick={onRetry}>{retrying ? 'Retrying…' : `Retry your ${sum.retry} transcriptions`}</button></p>
+        // Retrying them from here would happen off screen. The link filters History to those rows
+        // first, as Flow's search does, and the retry lives there where the rows can be seen.
+        <p className={s.sweepNote}>{sum.retry} transcriptions came back blank. <button className={s.textLink} onClick={onShowBlank}>Show them</button></p>
       )}
 
       <div className={s.sweepActions}>

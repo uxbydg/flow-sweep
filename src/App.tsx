@@ -17,7 +17,7 @@ import { Reminder } from './components/Reminder.tsx'
 import { SweepCard } from './components/SweepCard.tsx'
 import { Confirm } from './components/Dialogs.tsx'
 import { Toast } from './components/Toast.tsx'
-import { Search, Broom, ArrowLeft, RotateCcw } from './icons.ts'
+import { Search, Broom, ArrowLeft, RotateCcw, X } from './icons.ts'
 
 const DAY = 864e5
 const byId = new Map<string, Entry>(allEntries.map(e => [e.id, e]))
@@ -52,6 +52,8 @@ export default function App() {
   const [sweepOpen, setSweepOpen] = useState(false)
   const [q, setQ] = useState('')
   const [searchOpen, setSearchOpen] = useState(false)
+  const [filterBlank, setFilterBlank] = useState(false)
+  const [searching, setSearching] = useState(false)
   const [confirmEmpty, setConfirmEmpty] = useState(false)
   const [choices, setChoices] = useState<Map<string, boolean>>(new Map())
   const [dismissed, setDismissed] = useState<string | null>(loadDismissed)
@@ -66,11 +68,23 @@ export default function App() {
   const live = useMemo(() => allEntries.filter(e => !sweptIds.has(e.id) && !goneIds.has(e.id)), [sweptIds, goneIds])
   const cands = useMemo(() => detect(live), [live])
   const sum = useMemo(() => summarize(live, cands), [live, cands])
+  const retryIds = useMemo(() => new Set(cands.filter(c => c.reason === 'retry').map(c => c.entry.id)), [cands])
   const visible = useMemo(() => {
+    if (filterBlank) return live.filter(e => retryIds.has(e.id))
     const needle = q.trim().toLowerCase()
     if (!needle) return live
     return live.filter(e => textOf(e).toLowerCase().includes(needle) || appLabel(e.app).toLowerCase().includes(needle))
-  }, [live, q])
+  }, [live, q, filterBlank, retryIds])
+
+  // Flow's search spins for a moment after every keystroke, then the list is just the matches.
+  useEffect(() => {
+    if (!q && !filterBlank) return
+    setSearching(true)
+    const id = window.setTimeout(() => setSearching(false), 450)
+    return () => window.clearTimeout(id)
+  }, [q, filterBlank])
+  const showBlank = () => { setSweepOpen(false); setQ(''); setSearchOpen(false); setFilterBlank(true); window.scrollTo({ top: 0 }) }
+  const clearSearch = () => { setQ(''); setFilterBlank(false); setSearchOpen(false) }
 
   // Selected = the classifier's default unless the person said otherwise.
   const selected = useCallback((c: Candidate) => {
@@ -99,7 +113,6 @@ export default function App() {
       if (i === ids.length - 1) { setToast('Retry failed. Please try again.'); window.setTimeout(() => setToast(null), 4000) }
     }, 1600 + i * 350))
   }
-  const retryIds = cands.filter(c => c.reason === 'retry').map(c => c.entry.id)
   const sweepOne = (id: string) => setSwept(prev => [{ id, sweptAt: t }, ...prev])
   const restore = (id: string) => setSwept(prev => prev.filter(it => it.id !== id))
   const restoreAll = () => { setSwept([]); setView('history') }
@@ -167,12 +180,20 @@ export default function App() {
                       Swept · {swept.length}
                     </button>
                   )}
-                  {searchOpen ? (
+                  {filterBlank ? (
+                    // a predetermined search: the field holds the filter, and × clears it like any search
+                    <span className={s.searchBox}>
+                      {searching ? <i className={s.spinner} aria-label="Searching" /> : <Search size={16} />}
+                      <span className={s.token}>Came back blank</span>
+                      <button className={s.clear} aria-label="Clear" onClick={clearSearch}><X size={12} /></button>
+                    </span>
+                  ) : searchOpen ? (
                     <label className={s.searchBox}>
-                      <Search size={16} />
+                      {searching ? <i className={s.spinner} aria-label="Searching" /> : <Search size={16} />}
                       <input autoFocus placeholder="Search" value={q} onChange={e => setQ(e.target.value)} aria-label="Search transcripts"
                         onBlur={() => { if (!q) setSearchOpen(false) }}
-                        onKeyDown={e => { if (e.key === 'Escape') { e.stopPropagation(); setQ(''); setSearchOpen(false) } }} />
+                        onKeyDown={e => { if (e.key === 'Escape') { e.stopPropagation(); clearSearch() } }} />
+                      {q && <button className={s.clear} aria-label="Clear" onMouseDown={e => e.preventDefault()} onClick={clearSearch}><X size={12} /></button>}
                     </label>
                   ) : (
                     // Flow's bar is bare glyphs: the field appears only once search is asked for.
@@ -186,9 +207,17 @@ export default function App() {
               )}
             </div>
 
+            {view === 'history' && filterBlank && (
+              <p className={s.filterNote}>
+                {visible.length} transcriptions came back blank.{' '}
+                <button className={s.textLink} disabled={[...retryIds].some(id => retrying.has(id))} onClick={() => retry(visible.map(e => e.id))}>
+                  {[...retryIds].some(id => retrying.has(id)) ? 'Retrying…' : `Retry your ${visible.length} transcriptions`}
+                </button>
+              </p>
+            )}
             {view === 'history' && sweepOpen && (
               <SweepCard cands={cands} sum={sum} selected={selected} setMany={setMany} onSweep={sweep} onClose={() => setSweepOpen(false)}
-                retrying={retryIds.some(id => retrying.has(id))} onRetry={() => retry(retryIds)} />
+                onShowBlank={showBlank} />
             )}
             {view === 'cell'
               ? <HoldingCell items={swept} byId={byId} reasons={reasonOf} now={t} onRestore={restore} />

@@ -55,8 +55,9 @@ export function classify(e: Entry): Candidate | null {
   // Empty (incl. Flow's own failure statuses)
   if (text.length === 0 || FAILURE_STATUSES.has(e.status ?? '')) {
     // A long recording that came back empty probably held speech. Flow can already retry a
-    // transcript, so these are offered for retry, not swept by default.
-    if ((e.duration ?? 0) > 30) {
+    // transcript, so these are offered for retry, not swept by default. A DISMISSED one is not
+    // blank: the person cancelled it, Flow offers Recover, and it sweeps as empty.
+    if ((e.duration ?? 0) > 30 && e.status !== 'dismissed') {
       return { entry: e, reason: 'retry', confidence: 0.3, why: `${Math.round(e.duration ?? 0)} s recorded, no text came back` }
     }
     return {
