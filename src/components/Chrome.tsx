@@ -18,7 +18,7 @@ function Glyph({ size = 24, children, ...rest }: IconProps) {
 // a ring with a solid centre, larger than Lucide's circle-dot
 const Notetaker = (p: IconProps) => <Glyph {...p}><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="3.5" fill="currentColor" stroke="none" /></Glyph>
 // a page with a paperclip
-const Dictionary = (p: IconProps) => <Glyph {...p}><rect x="4" y="3" width="16" height="18" rx="3" /><path d="M14.5 8.5v6a2.5 2.5 0 0 1-5 0V8a1.5 1.5 0 0 1 3 0v6" /></Glyph>
+const Dictionary = (p: IconProps) => <Glyph {...p}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /><path d="M15 9.5v6a3 3 0 0 1-6 0V9a2 2 0 0 1 4 0v6" /></Glyph>
 // a large T and a small one
 const Style = (p: IconProps) => <Glyph {...p}><path d="M3 5h10M8 5v14" /><path d="M14 11h7M17.5 11v8" /></Glyph>
 // a note with two lines and a folded bottom-right corner
