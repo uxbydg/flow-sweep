@@ -154,8 +154,7 @@ Two tiers, readable in 30 seconds:
 Then one line for Retry (long empties) and one for short replies, and two buttons: Not now, Sweep N.
 The rows lift out of the list beneath the card. The tab-strip view and the modal are both gone.
 
-**Retry, as Flow does it (14 September, late, from Daniel's captures):** Retry your transcript /
-Retry your transcripts → the row's text becomes a pulsing grey bar → on failure a dark toast bottom
+**Retry, as Flow does it (14 September, late, from Daniel's captures):** "Retry your 0:05 transcription" (Flow desktop, the link is Retry and the length is the recording's) → the row's text becomes a pulsing grey bar → on failure a dark toast bottom
 right, red alert mark, "Retry failed. Please try again." The concept holds no audio, so every retry
 in it ends the way Flow's did that night: it fails, and the row offers Retry again. Live from the card
 line, from a row's Retry, and from the row menu's Retry transcript. The card's mark is the broom, not a

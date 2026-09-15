@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import s from '../App.module.scss'
 import type { Entry } from '../data/types.ts'
 import { textOf } from '../sweep/detect.ts'
-import { toDate, dayKey, dayLabel, flowTime } from '../format.ts'
+import { toDate, dayKey, dayLabel, flowTime, mmss } from '../format.ts'
 import { Play, Copy, Flag, EllipsisVertical, Undo2, RefreshCw, Broom, Trash2, FileAudio } from '../icons.ts'
 
 const PAGE = 120
@@ -77,10 +77,10 @@ function Row({ e, i, onSweep, onRetry, retrying }: { e: Entry; i: number; onSwee
       <span className={s.time}>{flowTime(t)}</span>
       <span className={s.text}>
         {retrying ? <span className={s.skeleton} aria-label="Retrying" /> : text || (
-          // Flow's own row copy: a dismissed transcription offers Recover; a long recording that
-          // came back blank offers Retry (Flow's mobile wording, applied to the desktop row).
+          // Flow's own desktop row copy, captured 14 Sep: a dismissed transcription offers Recover;
+          // a long recording that came back blank reads "Retry your 0:05 transcription".
           e.status === 'dismissed' ? <span className={s.rowNote}>This transcription was dismissed. <button className={s.textLink} disabled>Recover</button></span>
-          : (e.duration ?? 0) > 30 ? <span className={s.rowNote}>Retry your transcript. <button className={s.textLink} onClick={onRetry}>Retry</button></span>
+          : (e.duration ?? 0) > 30 ? <span className={s.rowNote}><button className={s.textLink} onClick={onRetry}>Retry</button> your {mmss(e.duration)} transcription</span>
           : null
         )}
       </span>

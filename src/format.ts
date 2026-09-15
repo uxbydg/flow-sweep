@@ -35,3 +35,9 @@ export function pct(n: number): string { return `${Math.round(n * 100)}%` }
 export function plural(n: number, one: string, many = `${one}s`): string {
   return `${n} ${n === 1 ? one : many}`
 }
+
+// Flow's duration in a retry row: "0:05", "2:32"
+export function mmss(sec: number | null | undefined): string {
+  const t = Math.max(0, Math.round(sec ?? 0))
+  return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`
+}

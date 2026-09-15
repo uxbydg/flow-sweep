@@ -95,7 +95,7 @@ export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose, ret
 
       {sum.retry > 0 && (
         // Flow's words for a transcript that came back blank, not ours.
-        <p className={s.sweepNote}>{sum.retry} transcripts came back blank. <button className={s.textLink} disabled={retrying} onClick={onRetry}>{retrying ? 'Retrying…' : 'Retry your transcripts'}</button></p>
+        <p className={s.sweepNote}>{sum.retry} transcriptions came back blank. <button className={s.textLink} disabled={retrying} onClick={onRetry}>{retrying ? 'Retrying…' : `Retry your ${sum.retry} transcriptions`}</button></p>
       )}
 
       <div className={s.sweepActions}>
