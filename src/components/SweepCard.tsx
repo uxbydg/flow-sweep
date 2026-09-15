@@ -3,7 +3,7 @@ import s from '../App.module.scss'
 import type { Candidate, Reason, Summary } from '../data/types.ts'
 import { textOf, appLabel } from '../sweep/detect.ts'
 import { ORDER, REASON_LABEL } from '../sweep/labels.ts'
-import { toDate, shortDate, pct } from '../format.ts'
+import { toDate, shortDate } from '../format.ts'
 import { Broom } from '../icons.ts'
 
 interface Props {
@@ -55,19 +55,18 @@ export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose, onS
       </div>
       {shown && (
         <div id="sweepRows" role="tabpanel" className={s.allList}>
-          {/* a table head: the select-all box sits over the row boxes, the column name over the numbers */}
+          {/* a table head: the select-all box sits over the row boxes. No percentage column: the reason
+              text and the worst-first order say the same thing in words, the way Flow would. */}
           <div className={s.allHead}>
             <input type="checkbox" className={s.check} checked={shownOn === shown.rows.length} aria-label={`Select all ${REASON_LABEL[shown.r]}`}
               onChange={e => setMany(shown.rows.map(c => c.entry.id), e.target.checked)} />
             <span className={s.sectionCount}>{shownOn} of {shown.rows.length} selected</span>
-            <span className={s.confHead}>Accident percentage</span>
           </div>
           {shown.rows.map(c => (
             <label key={c.entry.id} className={s.allRow}>
               <input type="checkbox" className={s.check} checked={selected(c)} onChange={e => setMany([c.entry.id], e.target.checked)} />
               <span>{textOf(c.entry) ? <span className={s.candText}>{textOf(c.entry)}</span> : <span className={s.candEmpty}>No text</span>}
                 <span className={s.why}>{c.why} · {appLabel(c.entry.app)} · {shortDate(toDate(c.entry.timestamp).getTime())}</span></span>
-              <span className={s.conf} aria-label={`${pct(c.confidence)} sure`}>{pct(c.confidence)}</span>
             </label>
           ))}
         </div>
