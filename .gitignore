@@ -28,3 +28,6 @@ src/data/history.private.json
 
 # Flow UI reference captures: carry personal stats and history, never committed
 ref/
+
+# tool output, not part of the artifact
+.impeccable/
