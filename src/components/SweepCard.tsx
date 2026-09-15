@@ -2,9 +2,9 @@ import { useState } from 'react'
 import s from '../App.module.scss'
 import type { Candidate, Reason, Summary } from '../data/types.ts'
 import { textOf, appLabel } from '../sweep/detect.ts'
-import { ORDER, REASON_LABEL, OPT_IN } from '../sweep/labels.ts'
+import { ORDER, REASON_LABEL } from '../sweep/labels.ts'
 import { toDate, shortDate, pct } from '../format.ts'
-import { RefreshCw, Check } from '../icons.ts'
+import { Check } from '../icons.ts'
 
 interface Props {
   cands: Candidate[]
@@ -22,13 +22,14 @@ export const SURE = 0.9
 // Two tiers, read top to bottom: what Flow decided, then the one question it has.
 export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose }: Props) {
   const [open, setOpen] = useState<Reason | null>(null)
-  const sweepable = cands.filter(c => !OPT_IN.includes(c.reason))
-  const sure = sweepable.filter(c => c.reason !== 'cutoff' || c.confidence >= SURE)
+  // Retry is Flow's own action, so it is a line, not a section. Everything else is a tab.
+  const sweepable = cands.filter(c => c.reason !== 'retry')
   const doubtful = sweepable.filter(c => c.reason === 'cutoff' && c.confidence < SURE).sort((a, b) => a.confidence - b.confidence)
-  const sureOn = sure.filter(selected).length
+  const decided = sweepable.filter(c => !doubtful.includes(c))
+  const decidedOn = decided.filter(selected).length
   const doubtOn = doubtful.filter(selected).length
-  const going = sureOn + doubtOn
-  const sections = ORDER.filter(r => !OPT_IN.includes(r)).map(r => ({ r, rows: sure.filter(c => c.reason === r).sort((a, b) => b.confidence - a.confidence) })).filter(g => g.rows.length)
+  const going = decidedOn + doubtOn
+  const sections = ORDER.filter(r => r !== 'retry').map(r => ({ r, rows: decided.filter(c => c.reason === r).sort((a, b) => b.confidence - a.confidence) })).filter(g => g.rows.length)
   const shown = sections.find(g => g.r === open)
   const shownOn = shown ? shown.rows.filter(selected).length : 0
 
@@ -36,7 +37,7 @@ export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose }: P
     <section className={`${s.sweepCard} ${s.enter}`} aria-labelledby="sweepTitle">
       <div className={s.sweepHead}>
         <span className={s.sweepMark}><Check size={13} strokeWidth={2.5} /></span>
-        <h3 id="sweepTitle" className={s.sweepTitle}>Flow will sweep <b>{sureOn}</b> transcripts.</h3>
+        <h3 id="sweepTitle" className={s.sweepTitle}>Flow will sweep <b>{decidedOn}</b> transcripts.</h3>
       </div>
 
       {/* Flow's tab strip: the breakdown, and each tab opens its own rows so every one can be seen and kept */}
@@ -90,10 +91,10 @@ export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose }: P
         </>
       )}
 
-      <div className={s.sweepNotes}>
-        {sum.retry > 0 && <p>{sum.retry} recordings over 30 s came back blank. Retry them before sweeping.<button className={s.chip} data-kind="ghost" disabled><RefreshCw size={12} />Retry</button></p>}
-        {sum.reply > 0 && <p>{sum.reply} short replies like “Do it.” stay.</p>}
-      </div>
+      {sum.retry > 0 && (
+        // Flow's words for a transcript that came back blank, not ours.
+        <p className={s.sweepNote}>{sum.retry} transcripts came back blank. <button className={s.textLink} disabled>Retry your transcripts</button></p>
+      )}
 
       <div className={s.sweepActions}>
         <p>Restorable for 7 days.</p>

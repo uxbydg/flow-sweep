@@ -75,7 +75,15 @@ function Row({ e, i, onSweep }: { e: Entry; i: number; onSweep: () => void }) {
     <motion.div className={s.row} layout="position" data-menu={menu}
       exit={{ opacity: 0, y: -6, transition: { duration: .22, delay: Math.min(i, 12) * .018, ease: [.4, 0, .2, 1] } }}>
       <span className={s.time}>{flowTime(t)}</span>
-      <span className={s.text}>{text}</span>
+      <span className={s.text}>
+        {text || (
+          // Flow's own row copy: a dismissed transcription offers Recover; a long recording that
+          // came back blank offers Retry (Flow's mobile wording, applied to the desktop row).
+          e.status === 'dismissed' ? <span className={s.rowNote}>This transcription was dismissed. <button className={s.textLink} disabled>Recover</button></span>
+          : (e.duration ?? 0) > 30 ? <span className={s.rowNote}>Retry your transcript. <button className={s.textLink} disabled>Retry</button></span>
+          : null
+        )}
+      </span>
       <span className={s.actions}>
         <span className={s.icon} data-tip="Play" aria-hidden="true"><Play size={14} /></span>
         <span className={s.icon} data-tip="Copy" aria-hidden="true"><Copy size={14} /></span>
