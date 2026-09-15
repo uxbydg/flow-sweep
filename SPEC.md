@@ -121,3 +121,9 @@ recordings (>30 s) get a **Retry first** section using Flow's existing "Retry tr
   ("Are you sure you want to delete this transcript?"). Scratchpad is a workspace you keep open
   beside other apps; Review is a decision you finish and close. If Review ever grows past one
   sitting (a threshold slider, per-row audio), the floating panel is the Flow-native answer.
+
+**Row menu (14 September, evening, Daniel's ask):** the three-dot ("More options") opens Flow's own
+menu with one line added, **Sweep transcript**, placed above Delete transcript: the reversible option
+before the irreversible one. It is the manual path for a row the classifier missed, and it goes to the
+same holding cell. Only that line is live in the concept; Undo AI edit, Retry, Delete, Extract audio are
+drawn, not wired. Tooltips and the menu hang past the card edge, so nothing in the list clips.

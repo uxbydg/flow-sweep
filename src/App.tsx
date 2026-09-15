@@ -84,6 +84,7 @@ export default function App() {
     setChoices(new Map())
     setSweepOpen(false)
   }
+  const sweepOne = (id: string) => setSwept(prev => [{ id, sweptAt: t }, ...prev])
   const restore = (id: string) => setSwept(prev => prev.filter(it => it.id !== id))
   const restoreAll = () => { setSwept([]); setView('history') }
   const emptyNow = () => {
@@ -168,7 +169,7 @@ export default function App() {
 
             {view === 'cell'
               ? <HoldingCell items={swept} byId={byId} reasons={reasonOf} now={t} onRestore={restore} />
-              : <HistoryList entries={visible} now={t} />}
+              : <HistoryList entries={visible} now={t} onSweepOne={sweepOne} />}
             {view === 'history' && (
               <p className={s.more}>{live.length} transcripts · {usingRealData ? 'real history, local only' : 'sample data'}</p>
             )}

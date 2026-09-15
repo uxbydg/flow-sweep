@@ -58,7 +58,8 @@
   &[disabled] { opacity: .45; cursor: default; } }
 .icon { border: 0; background: transparent; width: 24px; height: 24px; border-radius: var(--r-sm); display: inline-grid; place-items: center; color: var(--mut); cursor: pointer; position: relative; flex: none;
   &:hover { background: var(--line); color: var(--ink); }
-  &[data-on="true"] { color: var(--teal); background: var(--teal-soft); } }
+  &[data-on="true"] { color: var(--teal); background: var(--teal-soft); }
+  &[aria-expanded="true"] { background: var(--line); color: var(--ink); } }
 
 // dark pill tooltip, as Flow's "More options"
 [data-tip] { position: relative; }
@@ -77,14 +78,26 @@
   input { border: 0; outline: 0; background: transparent; font: inherit; font-size: 13px; width: 160px; padding: 3px 0; color: var(--ink); } }
 
 .dayLabel { margin: 22px 0 10px; }
-.day { border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--page); overflow: hidden; }
-.row { display: grid; grid-template-columns: 88px minmax(0, 1fr) auto; gap: 8px; padding: 0 12px; border-top: 1px solid var(--line); align-items: center; min-height: 42px; overflow: hidden;
-  &:first-child { border-top: 0; }
-  &:hover { background: var(--hover); .actions { opacity: 1; } } }
+// No overflow clipping on the card or its rows: tooltips and the More menu hang past the edge, as in Flow.
+.day { border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--page); }
+.row { display: grid; grid-template-columns: 88px minmax(0, 1fr) auto; gap: 8px; padding: 0 12px; border-top: 1px solid var(--line); align-items: center; min-height: 42px; position: relative;
+  &:first-child { border-top: 0; border-radius: var(--r-lg) var(--r-lg) 0 0; }
+  &:last-child { border-radius: 0 0 var(--r-lg) var(--r-lg); }
+  &:first-child:last-child { border-radius: var(--r-lg); }
+  &:hover, &[data-menu="true"] { background: var(--hover); .actions { opacity: 1; } }
+  &[data-menu="true"] { z-index: 6; } }
 .rowInner { display: contents; }
 .time { font-size: 11.5px; color: var(--mut); padding: 12px 0; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .text { font-size: 13px; line-height: 1.55; padding: 11px 0; white-space: pre-wrap; overflow-wrap: anywhere; max-width: 400px; }
 .actions { display: flex; gap: 2px; opacity: 0; transition: opacity .12s; }
+// Flow's row menu: white, hairline, soft shadow, hangs from the three-dot and past the card edge
+.menuAnchor { position: relative; display: inline-flex; }
+.menu { position: absolute; top: calc(100% + 4px); right: 0; z-index: 7; min-width: 172px; padding: 4px; background: #fff; border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow-pop); }
+.menuItem { display: flex; align-items: center; gap: 9px; width: 100%; border: 0; background: transparent; text-align: left; padding: 6px 8px; border-radius: var(--r-sm); font-size: 12.5px; color: var(--ink); cursor: pointer; white-space: nowrap;
+  svg { color: var(--ink-2); flex: none; }
+  &:hover { background: var(--hover); }
+  &[data-kind="danger"] { color: var(--coral-ink); svg { color: var(--coral); } }
+  &[disabled] { cursor: default; &:hover { background: transparent; } } }
 .more { text-align: center; padding: 18px; color: var(--mut); font-size: 12px; }
 
 // ---------- holding cell ----------

@@ -35,7 +35,7 @@ export function HoldingCell({ items, byId, reasons, now, onRestore }: Props) {
         <motion.section key={day} aria-label={leaveLabel(day, now)} exit={{ opacity: 0 }}>
           <h3 className={`${s.label} ${s.dayLabel}`}>{leaveLabel(day, now)} · {rows.length}</h3>
           <div className={s.day}>
-            <AnimatePresence initial={false}>
+            <AnimatePresence initial={false} mode="popLayout">
               {rows.map(it => {
                 const e = byId.get(it.id)
                 if (!e) return null
@@ -44,7 +44,7 @@ export function HoldingCell({ items, byId, reasons, now, onRestore }: Props) {
                 return (
                   <motion.div key={it.id} className={s.row} layout="position"
                     initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                    exit={{ opacity: 0, x: 12, height: 0, minHeight: 0, transition: { duration: .2 } }}>
+                    exit={{ opacity: 0, x: 12, transition: { duration: .2 } }}>
                     <span className={s.time}>{shortDate(t)}, {flowTime(t)}</span>
                     <span className={s.text}>
                       {textOf(e) || <span style={{ color: 'var(--label)' }}>No text</span>}
