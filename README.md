@@ -81,14 +81,28 @@ read Flow's settings. Light only, because Flow's desktop app is.
 
 ## How it was built
 
-This is my first React and TypeScript build, paired with Claude Code, across three working sessions
-on 12, 14, and 15 September 2026. I set the direction and made every product call: the card over a
-modal or a pane, the icon over a permanent card, completeness over app-weighting, the holding cell,
-Flow's voice for every sentence, and one-for-one fidelity to Flow's chrome, checked on proof sheets
-against my own screenshots. The model wrote most of the code and drafted most of the prose; I
-rejected the first classifier, the first three versions of the review, two rebuilds of the reminder
-card, and a search token that claimed a capability Flow does not have. The spec records those
-decisions, dated.
+The idea came from using Flow. I downloaded it on 8 August and have barely put it down since; I
+dictate everywhere, all day. Scrolling my own History I kept seeing empty transcripts, ones cut off
+mid-word, and ones I plainly did not need, and I wanted a way to clean them up. I would guess I am
+not the only one.
+
+This is my first React and TypeScript build, paired with Claude Code, across four working sessions
+from 12 to 16 September 2026. I came up with the idea, laid out the conditions and the rules for
+what counts as an accident, and decided how the sweep looks and moves. I never opened Figma. I took
+screenshots of Flow and we matched the build against them on proof sheets, then kept iterating
+until it felt like part of Flow's own design language. The model wrote most of the code and
+drafted most of the prose; every product call in the spec is mine, and dated.
+
+A lot got killed: countless states for adding and removing rows from the sweep, and layouts along
+the way. The one that mattered was the review itself. Early on it listed every transcript that was
+about to go, and it read like a giant checklist. What replaced it is two tiers. What Flow is sure
+about is counted, not listed: the empty ones, the cut-offs it is certain of, and the ones you
+marked yourself. The only things put in front of you are the ones it is not sure about, as chips
+you can flip. Sweep transcript also went into the row's own menu, so a single row can go on your
+say-so rather than the classifier's.
+
+What I was going for: a flow that fits inside Flow's language rather than beside it, that could
+genuinely ship, and that was built with care.
 
 ## Data and privacy
 
