@@ -18,6 +18,12 @@ import { SweepCard } from './components/SweepCard.tsx'
 import { Confirm } from './components/Dialogs.tsx'
 import { Toast } from './components/Toast.tsx'
 import { Search, Broom, ArrowLeft, RotateCcw, X } from './icons.ts'
+import { NOTES } from './notes/notes.ts'
+import type { SweepMode } from './notes/notes.ts'
+import { NoteMarkers } from './notes/NoteMarkers.tsx'
+import { NotesDrawer } from './notes/NotesDrawer.tsx'
+import { useNotes } from './notes/useNotes.ts'
+import { useNudge } from './notes/useNudge.ts'
 
 const DAY = 864e5
 const RECOVERED_TEXT = 'Okay, go back to the punch list and take the top three in order. Start with the header, then the card art, then the footer. Show me each one in the browser before you move on to the next.'
@@ -71,6 +77,39 @@ export default function App() {
   })
   const [view, setView] = useState<'history' | 'cell'>('history')
   const [sweepOpen, setSweepOpen] = useState(false)
+  /**
+   * ⚑⚑ STATE, not a ref, and the difference is load-bearing.
+   *
+   * A ref does not trigger a render when it is populated, so the markers layer
+   * mounted with `frame={null}`, its effect returned early, and nothing ever
+   * re-ran it. It happened to work only because the layer used to auto-open a
+   * note on mount, and that second render handed it a populated ref. Removing
+   * the auto-open removed the accident holding it up: `?notes` turned the layer
+   * on and drew no markers at all.
+   *
+   * A callback ref stored in state renders when the node attaches, which is
+   * what the measurement actually depends on.
+   */
+  const [frameEl, setFrameEl] = useState<HTMLDivElement | null>(null)
+
+  /**
+   * ⚑⚑ THE PORT'S ONE REAL ADAPTATION.
+   *
+   * The Athletic has two modes and a note names one of them. Sweep's states are
+   * a view AND a card that may or may not be unfolded, so a note's mode is
+   * applied here rather than stored as a single flag. Opening a note about the
+   * ask row unfolds the card; opening one about the holding cell walks over to
+   * it. That is the behaviour worth porting: the drawer never discusses a
+   * region the reader cannot currently see.
+   */
+  const applyNoteMode = useCallback((m: SweepMode) => {
+    setView(m === 'cell' ? 'cell' : 'history')
+    setSweepOpen(m === 'sweep')
+    if (m !== 'history') setBlankIds(null)
+  }, [])
+  const notes = useNotes<SweepMode>(NOTES as never, applyNoteMode)
+  /* ⚑ Nudges only while the notes have never been opened. */
+  const nudging = useNudge(!notes.on)
   const [q, setQ] = useState('')
   const [searchOpen, setSearchOpen] = useState(false)
   const [blankIds, setBlankIds] = useState<Set<string> | null>(null)
@@ -147,6 +186,45 @@ export default function App() {
       if (i === ids.length - 1 && ids.some(x => x !== wins)) { setToast('Retry failed. Please try again.'); window.setTimeout(() => setToast(null), 4000) }
     }, 1600 + i * 350))
   }
+  /**
+   * ⚑⚑⚑ THE NOTE MUST HAVE SOMETHING TO POINT AT.
+   *
+   * Note 6 argues about how the holding cell folds a hundred blank rows into
+   * one line per day. Opening it walked to the cell and framed it, and the cell
+   * said "Nothing swept." The drawer was discussing a state the reader had not
+   * reached, with a frame drawn neatly around the absence of it.
+   *
+   * Daniel's requirement, 23 September: the note and the region it explains have
+   * to be readable at the same time, in the same window. An empty region is the
+   * same failure as an off-screen one.
+   *
+   * So opening a cell note seeds the cell, once, with what the sweep button
+   * would have swept. Nothing invented: the classifier's own default selection,
+   * run for real, so Restore all gives the history back.
+   *
+   * ⚑⚑⚑ AND IT SEEDS ONLY PART OF IT, which the first version got wrong and
+   * Daniel's own check caught. Sweeping every candidate populated the cell and
+   * then emptied the history the OTHER notes stand on: paging back to note 2
+   * read "Flow will sweep 0 transcripts" under a note arguing that the number
+   * in the sentence matches the number on the button, note 3 framed an empty
+   * tab strip, and note 4 said "0 of 16 will go". One note's region was fixed
+   * by breaking three others.
+   *
+   * Seeding the OLDEST portion is also the more honest state: a holding cell
+   * holds what you swept days ago, and the card offers what is sweepable now.
+   * Those are different sets in real use, and now they are here too.
+   */
+  const SEED_N = 60
+  useEffect(() => {
+    if (!notes.on || view !== 'cell' || swept.length > 0) return
+    const chosen = detect(allEntries)
+      .filter(c => !OPT_IN.includes(c.reason) && c.confidence >= DEFAULT_THRESHOLD)
+      .sort((a, b) => toDate(a.entry.timestamp).getTime() - toDate(b.entry.timestamp).getTime())
+      .slice(0, SEED_N)
+    if (!chosen.length) return
+    setSwept(chosen.map(c => ({ id: c.entry.id, sweptAt: t - HOLD_DAYS * DAY / 2 })))
+  }, [notes.on, view, swept.length, t])
+
   const sweepOne = (id: string) => setSwept(prev => [{ id, sweptAt: t }, ...prev])
   const restore = (id: string) => setSwept(prev => prev.filter(it => it.id !== id))
   const restoreMany = (ids: string[]) => { const gone = new Set(ids); setSwept(prev => prev.filter(it => !gone.has(it.id))) }
@@ -183,7 +261,7 @@ export default function App() {
   const firstDay = visible[0] ? dayLabel(toDate(visible[0].timestamp).getTime(), t) : 'Today'
 
   return (
-    <div className={s.window}>
+    <div className={s.window} ref={setFrameEl} data-drawer={notes.on && notes.activeId !== null}>
       <Titlebar />
       <Sidebar />
       <div className={s.panel}>
@@ -232,7 +310,7 @@ export default function App() {
                     // Flow's bar is bare glyphs: the field appears only once search is asked for.
                     <button className={s.icon} aria-label="Search transcripts" onClick={() => setSearchOpen(true)}><Search size={16} /></button>
                   )}
-                  <button className={s.icon} data-tip="Sweep" data-on={sweepOpen} aria-expanded={sweepOpen} aria-controls="sweepCard" aria-label={`Sweep, ${sum.candidates} to review`} onClick={() => setSweepOpen(o => !o)}>
+                  <button className={s.icon} data-note="broom" data-tip="Sweep" data-on={sweepOpen} aria-expanded={sweepOpen} aria-controls="sweepCard" aria-label={`Sweep, ${sum.candidates} to review`} onClick={() => setSweepOpen(o => !o)}>
                     <Broom size={16} />
                     {sum.candidates > 0 && <i className={s.dot} />}
                   </button>
@@ -259,7 +337,7 @@ export default function App() {
               </div>
             )}
             {view === 'cell'
-              ? <HoldingCell items={swept} byId={byId} reasons={reasonOf} now={t} onRestore={restore} onRestoreMany={restoreMany} />
+              ? <div data-note="cell"><HoldingCell items={swept} byId={byId} reasons={reasonOf} now={t} onRestore={restore} onRestoreMany={restoreMany} /></div>
               : <HistoryList key={filterBlank ? 'blank' : 'all'} entries={visible} now={t} onSweepOne={sweepOne} onRetry={id => retry([id])} retrying={retrying} />}
             {view === 'history' && (
               <p className={s.more}>{live.length} transcripts · {usingRealData ? 'real history, local only' : 'sample data'}</p>
@@ -277,6 +355,27 @@ export default function App() {
           </div>
         </div>
       </div>
+
+      {notes.on && (
+        <NoteMarkers
+          frame={frameEl}
+          mode={view === 'cell' ? 'cell' : sweepOpen ? 'sweep' : 'history'}
+          activeId={notes.activeId}
+          onOpen={notes.open}
+        />
+      )}
+
+      {/* ⚑ Outside the app chrome and deliberately plain: it is the one control
+          on screen that is not Flow's. */}
+      <button className={`${s.notesToggle} ${nudging ? s.notesNudge : ''}`} data-on={notes.on}
+        data-shift={notes.on && notes.activeId !== null}
+        onClick={notes.toggle}>
+        Design notes
+      </button>
+
+      {notes.on && notes.activeId !== null && (
+        <NotesDrawer activeId={notes.activeId} onStep={notes.step} onClose={notes.close} />
+      )}
 
       {toast && <Toast text={toast} />}
       <AnimatePresence>

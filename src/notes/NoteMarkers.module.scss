@@ -1,0 +1,103 @@
+/* ---------------------------------------------------------------------------
+   The markers layer.
+
+   It sits over the app and never intercepts a click except on a marker itself,
+   so the prototype stays usable with notes on.
+
+   ⚑⚑⚑ REBUILT 23 September after Daniel looked at it: "there needs to be a
+   direct design affordance correlation between the note being shown in the
+   drawer and the marker highlighting the prototype."
+
+   There was not. Every marker rendered as the same filled teal disc and the
+   active one differed by a ring at 35% opacity, which is invisible. Note 7
+   could be open while marker 1 sat lit. The layer's entire job is that
+   correlation and it was the one thing it did not do.
+
+   The correlation is now carried by ONE object shown in TWO places: a filled
+   teal disc with the note's number, on the region and in the drawer header.
+   Nothing else in either surface is a teal disc with a number in it.
+
+   ⚑ Re-toned for Flow at the same time. The Athletic version is amber on
+   black, which on Flow's paper would read as a warning. Teal is Flow's own
+   emphasis colour and what the sweep card already uses for selection, so a
+   marked region reads as selected rather than flagged. Coral stays out: Flow
+   spends it only on destructive actions.
+--------------------------------------------------------------------------- */
+.layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* ---------------------------------------------------------------------------
+   The frame.
+
+   ⚑⚑ EXACTLY ONE renders, and only for the open note. Framing every region at
+   once turns the prototype into a wireframe and tells the reader nothing about
+   which one is being discussed.
+
+   It is drawn 4px OUTSIDE the measured rect so the region's own edges stay
+   legible underneath, at 2px so it survives a screen recording, with a wash
+   light enough that text inside it is still comfortable to read. A frame that
+   obscures the thing it points at has failed at the only job it has.
+--------------------------------------------------------------------------- */
+.outline {
+  position: absolute;
+  border: 2px solid var(--teal);
+  border-radius: var(--r);
+  background: rgba(46, 91, 91, 0.06);
+  box-shadow: 0 0 0 4px rgba(46, 91, 91, 0.08);
+  pointer-events: none;
+  transition: top 180ms ease, left 180ms ease, width 180ms ease, height 180ms ease;
+}
+
+/* ---------------------------------------------------------------------------
+   The markers.
+
+   A marker sits just OUTSIDE its region's top-right corner so it never covers
+   a control, and tucks back inside only where the region runs to the edge of
+   the frame.
+--------------------------------------------------------------------------- */
+.marker {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  /* ⚑ The RESTING state is quiet: a hollow disc on paper. These are navigation,
+     not annotation, and eight filled discs over a running app is a diagram. */
+  background: var(--page);
+  border: 1px solid var(--line);
+  color: var(--mut);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  display: grid;
+  place-items: center;
+  pointer-events: auto;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(26, 26, 26, 0.1);
+  transition: background 160ms ease, color 160ms ease, border-color 160ms ease,
+    transform 160ms ease, box-shadow 160ms ease;
+}
+
+.marker:hover {
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+/* ⚑⚑ THE ACTIVE ONE, and the difference has to be obvious at a glance on a
+   compressed screen recording, not just in the browser. Filled, larger, white
+   number, and a teal halo. This is the disc the drawer header repeats. */
+.markerOn {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: #ffffff;
+  transform: scale(1.18);
+  box-shadow: 0 0 0 4px rgba(46, 91, 91, 0.16), 0 2px 8px rgba(26, 26, 26, 0.2);
+  cursor: default;
+}
+
+.markerOn:hover {
+  color: #ffffff;
+}

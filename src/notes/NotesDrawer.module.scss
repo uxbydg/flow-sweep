@@ -1,0 +1,569 @@
+/* ---------------------------------------------------------------------------
+   ⚑⚑⚑ CONTRAST. Flow's own greys fail on Flow's own paper, and this drawer is
+   not Flow's, so it does not get to inherit the failure.
+
+   Measured on --page, #FCFCFB:
+     --mut    #939390   3.00:1   fails AA for body text
+     --label  #AFAFAD   2.14:1   fails badly
+   The prototype keeps using them, because reproducing the product faithfully
+   includes reproducing the parts I would not have chosen. The drawer is my
+   writing and uses values that pass:
+     #55544F  7.39:1   the posting quotes, which have to be read
+     #6E6D69  5.05:1   datelines, labels, the artwork notice, footers
+--------------------------------------------------------------------------- */
+.drawer {
+  --note-quote: #55544F;
+  --note-quiet: #6E6D69;
+}
+
+/* ---------------------------------------------------------------------------
+   ⚑⚑ PORTED 2026-09-23 AND RE-THEMED, WHICH IS THE REAL WORK OF THE PORT.
+
+   The Athletic's app is dark and separates its blocks with pure black gutters,
+   so the drawer there is black panels on black. Flow's desktop app is LIGHT
+   ONLY, sampled from the 14 September captures, and it separates things with a
+   1px warm line and a lot of paper.
+
+   A drawer carried over unchanged would have been a black slab bolted to a
+   cream app: the notes would have read as a tool inspecting the product rather
+   than as part of it. So the structure is identical and every colour is Flow's.
+
+   The mapping, written down so the next port does not re-derive it:
+     --bg         ->  --page      the panel ground
+     --sep        ->  --line      the separator between sections
+     --rule       ->  --line      hairlines
+     --ink-dim    ->  --ink-2     secondary text
+     --ink-faint  ->  --mut       quiet text
+     --radius-pill->  999px
+   ⚑ And one that is NOT a swap: Flow's accent is --teal, but --coral is spent
+   only on destructive actions. Nothing in a notes drawer is destructive, so
+   coral never appears here.
+--------------------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------------------
+   ⚑⚑ THE DRAWER IS BUILT IN THE APP'S OWN STRUCTURAL LANGUAGE.
+
+   Daniel's reasoning, and it carries straight across: if the notes look like
+   another part of the product, a reader connects the work to it instead of
+   reading a critique pasted beside it.
+
+   Flow's signature, sampled from the 14 September desktop captures:
+     - panels on --page, the warm near-white the content column uses
+     - separated by a 1px --line, never by a heavy gutter
+     - generous paper around everything, which is most of what makes it Flow
+     - the chip shape from the sweep card, reused here to mark whose a
+       decision was
+     - teal for emphasis, and coral NEVER, because Flow spends coral only on
+       destructive actions and nothing in a notes drawer is destructive
+
+   Nothing is invented for this panel. Every value is either Flow's own token or
+   was measured off the captures for the prototype.
+--------------------------------------------------------------------------- */
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 400px;
+  /* ⚑⚑⚑ IT SLIDES IN, AND THE DURATION AND EASING ARE NOT ARBITRARY: they are
+     the handle's. The drawer used to appear instantly while the tab took 260ms
+     to travel across and meet it, so for a quarter of a second the tab floated
+     in the middle of the page attached to nothing. Daniel saw it as a gap:
+     "when it jumps, can it not have a gap."
+
+     A handle and the drawer it opens have to move as one object. If either of
+     these numbers changes, change the tab's `right` transition to match. */
+  animation: drawerIn 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* ⚑⚑ ONE CONTINUOUS SHEET OF PAPER, not panels floating on a separator.
+     The Athletic drawer sets its ground to the separator colour so a gutter
+     shows between every panel. Recoloured to Flow's palette that produced
+     cream bands on cream, which is that app's grammar wearing this app's
+     paint. Flow does not band; it rules and it breathes. */
+  background: var(--page);
+  border-left: 1px solid var(--line);
+  overflow-y: auto;
+  z-index: 20;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 26px 14px;
+}
+
+.count {
+  font-size: 12px;
+  color: var(--note-quiet);
+  font-variant-numeric: tabular-nums;
+}
+
+.nav {
+  margin-left: auto;
+  display: inline-flex;
+  gap: 6px;
+}
+
+.navBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--line);
+  color: var(--ink);
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+}
+
+.navBtn:disabled {
+  opacity: 0.3;
+}
+
+/* ⚑ The note title takes Flow's banner heading: its serif at a regular weight,
+   not the heavy display face The Athletic leads its cards with. */
+.titleBlock {
+  padding: 0 26px 22px;
+}
+
+.title {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+/* ⚑⚑ A section is separated the way Flow separates anything: a hairline and
+   air. No panel, no band, no second background.
+
+   This is the holdover Daniel caught on 23 September, and it is worth naming
+   precisely because the colours were already right. An 8px band is The
+   Athletic's structural grammar whatever colour it is painted, and swapping
+   #000 for --line only disguised it. Porting a component means porting the
+   structure too, and the structure is the part that is easy to miss because
+   nothing about it looks wrong in isolation. */
+.section {
+  border-top: 1px solid var(--line);
+  padding: 26px 26px 28px;
+}
+
+/* ⚑⚑ Flow's own label treatment, borrowed with ONE deliberate departure.
+   Flow sets these 11px, 500, letter-spaced .08em, in --label. Its own labels
+   are also UPPERCASE (TODAY, SEPTEMBER 12, 2026) and these are not, because
+   Daniel's standing copy rule is no uppercase outside acronyms and this drawer
+   is his writing rather than Flow's product copy.
+
+   The tension is real and the call is deliberate: borrow the host's METRICS so
+   the panel sits inside their system, keep his rules for his own words. The
+   Athletic's 19px bold serif heading was its feed's voice and is gone. */
+.label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--note-quiet);
+  margin: 0 0 12px;
+}
+
+.body {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+/* The review, drawn as a review: rating first, then the words in quotes. */
+.review {
+  margin: 0;
+}
+
+.reviewHead {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.stars {
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  color: #C8912B;
+  line-height: 1;
+}
+
+.starsOff {
+  color: var(--line);
+}
+
+.reviewMeta {
+  font-size: 11.5px;
+  color: var(--note-quiet);
+}
+
+.reviewText {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--ink);
+  text-indent: -0.36em;
+}
+
+.mark {
+  color: #C8912B;
+}
+
+.reviewNote {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* The decision carries the emphasis, in Flow's own teal rather than a
+   colour invented for this panel. */
+.decision {
+  margin: 0;
+  border-left: 3px solid var(--teal);
+  background: var(--teal-soft);
+  border-radius: 0 4px 4px 0;
+  padding: 13px 15px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+/* ⚑ Flow's own chip, theirs. The sweep card uses it to carry a reason; here it
+   item came through. Here it says which hand a decision came from. */
+.whose {
+  margin: 0 0 12px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+.whose:last-child {
+  margin-bottom: 0;
+}
+
+.pill {
+  display: inline-block;
+  padding: 3px 10px;
+  margin-right: 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink);
+  vertical-align: 1px;
+}
+
+.asks {
+  margin: 0 0 11px;
+  font-family: var(--serif);
+  font-size: 14px;
+  line-height: 1.42;
+  color: var(--ink-2);
+  border-left: 2px solid var(--line);
+  padding-left: 12px;
+}
+
+.evidence {
+  background: var(--page);
+  border-top: 1px solid var(--line);
+  margin: 0;
+  padding: 22px 26px;
+  font-size: 12px;
+  color: var(--ink-2);
+  line-height: 1.45;
+}
+
+.footer {
+  background: var(--page);
+  border-top: 1px solid var(--line);
+  margin: 0;
+  padding: 22px 26px 28px;
+  font-size: 12px;
+  color: var(--note-quiet);
+  line-height: 1.5;
+}
+
+.footer a {
+  color: var(--ink-2);
+}
+
+/* ---------------------------------------------------------------------------
+   ⚑⚑ THE CLOSING NOTE, DELIBERATELY NOT A SECTION.
+
+   The eight argue about the product, so they are built like the product:
+   ruled sections, sans body copy, their chip.
+
+   This one changes subject, so it changes form. No rules at all, serif
+   throughout, a wider measure, and a signature. A reader
+   registers that shift before reading a word, which is the whole point of
+   giving it a different treatment rather than a different heading.
+--------------------------------------------------------------------------- */
+.closing {
+  background: var(--page);
+  padding: 4px 24px 28px;
+}
+
+.closingLede {
+  font-family: var(--serif);
+  font-size: 18.5px;
+  line-height: 1.45;
+  color: var(--ink);
+  margin: 0 0 22px;
+}
+
+/* ---------------------------------------------------------------------------
+   The posting map.
+
+   ⚑⚑ Their words and the work are DIFFERENT KINDS OF THING and now look it.
+   The old version set both as a definition list four grey-steps apart, which
+   is why six rows read as one block. A quotation and an answer to it should
+   never be the same object on a page.
+--------------------------------------------------------------------------- */
+.mapped {
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+}
+
+.mappedRow {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 12px;
+  padding: 16px 0 18px;
+  border-top: 1px solid var(--line);
+}
+
+.mappedRow:first-child {
+  border-top: 0;
+  padding-top: 4px;
+}
+
+/* Six of anything needs a way to be counted. */
+.mappedNum {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--teal-soft);
+  color: var(--teal);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  display: grid;
+  place-items: center;
+  margin-top: 1px;
+}
+
+.mappedBody {
+  min-width: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   ⚑⚑ SIZE AND COLOUR NOW AGREE. Daniel: "are these supposed to not necessarily
+   be as prevalent as the text below it, because the text is also kind of
+   small?"
+
+   They were not, and the pair was contradicting itself: the quote was LARGER
+   at 14px but dimmer, and the answer was SMALLER at 13.5px but white. One axis
+   said the quote led, the other said the answer did, so neither won and the
+   reader had to decide.
+
+   The answer is the payload; the quote is only the prompt that sets it up. So
+   the quote now recedes on BOTH axes and the answer leads on both. With the
+   serif-against-sans difference already there, the relationship reads without
+   anybody having to work it out.
+--------------------------------------------------------------------------- */
+
+/* THEIR words: the prompt. Smaller, muted, serif, marks visible. */
+.asks {
+  font-family: var(--serif);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--note-quote);
+  margin: 0 0 9px;
+}
+
+/* THE WORK: the payload. Larger, brighter, and set in the sans so it never
+   reads as a continuation of the quotation above it. */
+.shows {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.62;
+  color: var(--ink);
+}
+
+/* ⚑ The paragraph that makes the rest believable. */
+/* ⚑⚑ The limits, as a countable list rather than a seventeen-line paragraph.
+   A reader should be able to see how many there are without reading them. */
+.limits {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.limits li {
+  position: relative;
+  padding: 0 0 0 18px;
+  margin-bottom: 11px;
+  font-family: var(--serif);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.limits li:last-child {
+  margin-bottom: 0;
+}
+
+.limits li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 9px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--teal);
+  opacity: 0.55;
+}
+
+/* The artwork statement. Quieter than everything above it and set in the sans
+   rather than the serif, because it is a notice and not an argument. */
+.provenance {
+  margin: 10px 0 0;
+  border-left: 3px solid var(--line);
+  padding-left: 14px;
+}
+
+.provenance p {
+  margin: 0 0 10px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--note-quiet);
+}
+
+.provenance p:last-child {
+  margin-bottom: 0;
+}
+
+
+.signBlock {
+  margin: 26px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.signMark {
+  width: 30px;
+  height: 30px;
+  display: block;
+  flex: 0 0 auto;
+}
+
+.sign {
+  font-family: var(--serif);
+  font-size: 17px;
+  color: var(--ink);
+  margin: 0;
+  letter-spacing: -0.005em;
+}
+
+.closingFooter {
+  margin: 20px 0 0;
+  font-size: 12px;
+  color: var(--note-quiet);
+  line-height: 1.5;
+}
+
+.closingFooter a {
+  color: var(--ink-2);
+}
+
+/* ---------------------------------------------------------------------------
+   ⚑⚑⚑ The header disc: the drawer's half of the marker correlation.
+
+   Identical to `.markerOn` in NoteMarkers.module.scss, deliberately and to the
+   pixel. If one of them changes, change both: the whole affordance rests on a
+   reader recognising them as the same object, and a 2px difference in size or a
+   slightly different teal breaks that without looking broken.
+
+   Nothing else in this drawer or in Flow is a filled teal disc with a number.
+--------------------------------------------------------------------------- */
+.marker {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--teal);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  box-shadow: 0 0 0 4px rgba(46, 91, 91, 0.16);
+}
+
+@keyframes drawerIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* The panel still arrives, it just stops travelling to get here. */
+@media (prefers-reduced-motion: reduce) {
+  .drawer {
+    animation: none;
+  }
+}
+
+/* ⚑ A quieter label than the section headings above it. The artwork notice is
+   a statement of fact, not another part of the argument, and giving it the
+   same heading weight would promote it above the work. */
+.labelQuiet {
+  margin: 24px 0 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--note-quiet);
+}
+
+/* ⚑ Inside the closing note the headings sit in one continuous flow rather
+   than inside .section wrappers, so they supply their own air. Without this
+   the map runs straight into "What This Does Not Show" and the hierarchy the
+   headings exist to create disappears. */
+.closing .label {
+  margin: 30px 0 4px;
+}
+
+.closing .label:first-of-type {
+  margin-top: 26px;
+}
+
+/* ⚑ The closing note's own heading. It was never rendered, which left the
+   standfirst doing a heading's job at standfirst length. Short, serif, and the
+   largest thing on the page, so a reader lands on "The case for me" and not on
+   a four-line sentence. */
+.closingTitle {
+  font-family: var(--serif);
+  font-size: 25px;
+  line-height: 1.16;
+  font-weight: 400;
+  letter-spacing: -0.012em;
+  color: var(--ink);
+  margin: 0 0 14px;
+}

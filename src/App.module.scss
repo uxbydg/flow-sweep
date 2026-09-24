@@ -215,3 +215,119 @@
   .sweepActions { flex-wrap: wrap; p { flex-basis: 100%; } }
   .searchBox input { width: 110px; }
 }
+
+/* ---------------------------------------------------------------------------
+   Room for the drawer.
+
+   ⚑⚑ THE ATHLETIC SHIFTS ITS PHONE WITH A TRANSFORM. THAT IS WRONG HERE, twice
+   over. A transformed ancestor makes `position: fixed` resolve against it
+   rather than the viewport, which is the bug that pushed the Athletic's drawer
+   off screen until it was moved outside the stage. And a desktop window sliding
+   sideways breaks the one illusion this prototype depends on.
+
+   So the window gives up width instead of moving. It reads as the app sharing
+   the screen with the panel, which is what is actually happening.
+--------------------------------------------------------------------------- */
+.window {
+  transition: padding-right 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* ⚑ Only where there is room. The drawer is 400px and Flow's content column
+   plus its sidebar needs about 800 to stay honest, so below 1200 the drawer
+   overlays instead and the app keeps its proportions. A squeezed reproduction
+   is a worse lie than a covered one: the first misrepresents the product, the
+   second just hides part of it. */
+@media (min-width: 1200px) {
+  .window[data-drawer='true'] {
+    padding-right: 400px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   The design notes toggle.
+
+   ⚑ Deliberately NOT one of Flow's chips. Every other control on screen belongs
+   to the product being proposed to; this one belongs to the person proposing.
+   Making it look native would blur the only line in the interface that actually
+   matters, which is where Flow ends and where I start.
+--------------------------------------------------------------------------- */
+/* ⚑⚑⚑ Brad's edge tab, per design-notes-spec.md: "a small dark tab sits on the
+   prototype's right edge at mid-height." This was a pill in the bottom corner
+   and Daniel did not see it at all. A control in a corner reads as a utility
+   badge; a tab on the edge reads as a drawer handle, which says "there is
+   something behind this" without a word of instruction.
+
+   ⚑ It shares the viewport's right edge with the drawer, because a handle and
+   the thing it opens have to come from the same edge or the metaphor breaks. */
+.notesToggle {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 6;
+  padding: 18px 11px;
+  /* ⚑⚑⚑ FILLED in its default state. Daniel: "it's a little too blended in.
+     It needs to pop out more... the default state needs to have a poppy
+     color." A control whose first job is to be found cannot be paper on paper,
+     which is what it was. Teal is Flow's own emphasis colour; coral stays out,
+     because Flow spends coral only on destructive actions. */
+  border: 1px solid var(--teal);
+  border-right: 0;
+  border-radius: 12px 0 0 12px;
+  background: var(--teal);
+  color: #ffffff;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  cursor: pointer;
+  box-shadow: -8px 0 26px rgba(46, 91, 91, 0.22);
+  transition: right 260ms cubic-bezier(0.2, 0.8, 0.2, 1), color 160ms ease,
+    border-color 160ms ease, background 160ms ease;
+}
+
+.notesToggle:hover {
+  background: #37706f;
+  border-color: #37706f;
+}
+
+/* Rides out to sit against the drawer's leading edge, so the handle stays
+   attached to the thing it opened. Unlike the window's padding this is not
+   gated on width: the handle must never sit UNDER the drawer. */
+.notesToggle[data-shift='true'] {
+  right: 400px;
+}
+
+/* ⚑ Open is the quiet state: the drawer itself announces that notes are on,
+   so the handle stops competing with the panel it opened. */
+.notesToggle[data-on='true'] {
+  background: var(--teal-soft);
+  border-color: var(--teal);
+  color: var(--teal);
+  box-shadow: -4px 0 14px rgba(26, 26, 26, 0.08);
+}
+
+/* ⚑⚑ The nudge: two short boops, then it leaves you alone. The tab leans out of
+   the edge and settles back, twice, with a deeper glow on the way out.
+
+   Timing, the count, and the stop condition live in useNudge.ts. An `infinite`
+   here would have been two characters and a nag nobody could turn off. */
+@keyframes notesNudge {
+  0%, 52%, 100% {
+    transform: translate(0, -50%);
+    box-shadow: -8px 0 26px rgba(46, 91, 91, 0.22);
+  }
+  13%, 39% {
+    transform: translate(-10px, -50%);
+    box-shadow: -14px 0 32px rgba(46, 91, 91, 0.4);
+  }
+  26% { transform: translate(0, -50%); }
+}
+
+.notesNudge { animation: notesNudge 1800ms cubic-bezier(0.34, 1.3, 0.5, 1); }
+
+// The setting exists to refuse exactly this kind of motion.
+@media (prefers-reduced-motion: reduce) {
+  .notesNudge { animation: none; }
+}

@@ -60,10 +60,10 @@ export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose, onS
   return (
     <section className={s.sweepCard} aria-labelledby="sweepTitle">
       {/* one live number, the same one the button carries; the strip and the question show how it is made */}
-      <h3 id="sweepTitle" className={s.sweepTitle}><Broom size={16} className={s.sweepGlyph} /><span>Flow will sweep <b>{going}</b> transcripts.</span></h3>
+      <h3 id="sweepTitle" className={s.sweepTitle} data-note="count"><Broom size={16} className={s.sweepGlyph} /><span>Flow will sweep <b>{going}</b> transcripts.</span></h3>
 
       {/* Flow's tab strip: only what goes; each tab opens its own rows so every one can be seen and kept */}
-      <div className={`${s.tabs} ${s.cardTabs}`}>
+      <div className={`${s.tabs} ${s.cardTabs}`} data-note="strip">
         {sections.map(({ r, rows: list }) => {
           const on = list.filter(selected).length
           return (
@@ -89,7 +89,7 @@ export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose, onS
       </div>
 
       {doubtful.length > 0 && (
-        <>
+        <div data-note="ask">
           <div className={s.sweepAsk}>
             {/* polarity in words: filled chips are the ones that go */}
             <h4>Are these accidents too? <small>{doubtOn} of {doubtful.length} will go</small></h4>
@@ -111,10 +111,10 @@ export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose, onS
               )
             })}
           </div>
-        </>
+        </div>
       )}
 
-      <div className={s.sweepActions}>
+      <div className={s.sweepActions} data-note="restore">
         <p>You can restore anything for 7 days.</p>
         <button className={s.chip} onClick={onClose}>Not now</button>
         <button className={s.chip} data-kind="dark" disabled={!going} onClick={onSweep}>Sweep {going}</button>

@@ -177,3 +177,69 @@ transcribe anything: one recovery (the longest blank recording) is staged with i
 success state can be seen, and says so on the row; the rest fail the way Flow's did that night. Live from the card
 line, from a row's Retry, and from the row menu's Retry transcript. The card's mark is the broom, not a
 check. A dismissed transcription reads "This transcription was dismissed. Recover" (Flow's desktop copy).
+
+---
+
+## The design notes layer (ported 23 September 2026)
+
+Built first on `~/athletic-feed` because that was the live build, then brought here, per
+`~/job-search/spearfish/design-notes-spec.md`. Seven notes: six on regions, one closing.
+
+**The pattern, unchanged from the ruling of 22 September.** Numbered markers sit on the regions
+they belong to and are the only thing visible at rest. Clicking one opens a right-edge drawer
+carrying that note in the quote-first layout. The drawer pages in marker order, and `?notes=1`
+opens straight into it with note 1 selected.
+
+### ⚑⚑ What had to change to make it portable, and it was only two things
+1. **`mode` is a type parameter now**, not the literal `'today' | 'proposed'`. Sweep's states are a
+   view plus a card that may or may not be unfolded, so `applyNoteMode` in `App.tsx` translates a
+   note's mode into both. Opening a note about the ask row unfolds the card; opening note 6 walks
+   over to the holding cell. ⚑ That behaviour is the reason this layer is worth porting at all:
+   the drawer never discusses a region the reader cannot currently see.
+2. **A problem no longer has to be a review.** The Athletic version drew stars and an App Store
+   date because every note there had one. **This file has none.** 254 Wispr Flow reviews were read
+   on 21 September and not one is about History or deletion, the Mac app has no store reviews, and
+   Reddit is closed to scripts. So a problem is now a review OR a sourced observation, and the
+   second kind must name its source, which the drawer prints where the stars would be. The
+   alternative was inventing a rating, and a prototype whose whole claim is traceability cannot
+   have a field that rewards that.
+
+### ⛑⛑⛑ CORRECTED 23 September, same day: the first re-theme was only a recolour
+Daniel, looking at the ported drawer: *"The design notes drawer for Sweep keeps a 'The Athletic'
+design holdover: the gutters. That's not in the Wispr Flow design language."*
+
+He was right. Every colour had been mapped and the **structure had not**. `border-top: 8px solid`
+is The Athletic's grammar whatever colour it is painted, and the drawer ground was still set to the
+separator colour, which is the trick that makes gutters show between panels. The result was banded
+cream on cream: correct palette, wrong product.
+
+Fixed: one continuous sheet of `--page` with a 1px left border, sections separated by a hairline and
+26px of air, section labels moved from The Athletic's 19px bold serif to Flow's own 11px / 500 /
+.08em in `--label`, and the note title moved to Flow's banner heading (400 22px serif). The stale
+comments went with it: four of them still described The Athletic's feed by name.
+
+⚑⚑ **The general rule and the six-axis audit that came out of this now live in
+`~/job-search/spearfish/design-notes-port.md`.** Read it before the next port. One line summary:
+*a component carries its old design language in its structure, not just its colours.*
+
+### ⚑ What the re-theme was, since it is most of the work
+The Athletic's app is dark and separates blocks with pure black gutters; Flow's desktop app is
+light only. Carried over unchanged, the drawer would have been a black slab bolted to a cream app,
+reading as a tool inspecting the product rather than as part of it. Structure is identical, every
+colour is Flow's, and the mapping is written at the top of `NotesDrawer.module.scss`. Markers are
+teal, which is what the sweep card already uses for selection, so a marked region reads as selected
+rather than flagged. **Coral never appears**: Flow spends it only on destructive actions.
+
+⚑ And the window gives up width rather than sliding. A transform on an ancestor makes
+`position: fixed` resolve against it instead of the viewport, which is the bug that pushed the
+Athletic's drawer off screen, and a desktop window sliding sideways breaks the illusion the whole
+prototype rests on. Below 1200px the drawer overlays instead, because a squeezed reproduction
+misrepresents the product where a partly covered one only hides it.
+
+### It is a copy, not a package
+Two repos, no shared workspace, and the Athletic build is frozen for recording. If a third
+prototype needs this, extract it then. The Athletic's copy keeps the concrete types; it is a
+finished artifact, not a library consumer.
+
+### Anchors
+`broom` and `cell` in `App.tsx`; `count`, `strip`, `ask`, and `restore` in `SweepCard.tsx`.
