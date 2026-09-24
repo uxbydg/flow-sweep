@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence } from 'motion/react'
 import s from './App.module.scss'
 import { entries as allEntries, usingRealData } from './data/load.ts'
@@ -122,7 +122,30 @@ export default function App() {
   const [toast, setToast] = useState<string | null>(null)
   const [recovered, setRecovered] = useState<Map<string, string>>(new Map())
 
-  useEffect(() => { saveSwept(swept) }, [swept])
+  /**
+   * ⚑⚑⚑ THE SEEDED SWEEP IS NOT PERSISTED, and this was a real flaw.
+   *
+   * Opening note 6 sweeps 60 rows so the holding cell has something to point
+   * at. That write went to localStorage like any other, so a reader who paged
+   * through the notes got a permanently altered prototype: reload it the next
+   * day and 60 of your transcripts are still in the cell, swept by a note you
+   * read rather than by anything you did.
+   *
+   * Daniel caught it on his own machine: "when I open up Sweep, it has 60
+   * already swept. Is that just because that's where it was cached for me?"
+   * It was, and the next person to open the link would have inherited the same
+   * thing from their own reading.
+   *
+   * ⚑ The moment the reader touches it for real, by sweeping more or restoring
+   * any of it, the set stops matching the seed and it saves normally. A demo
+   * state does not survive a reload; a decision does.
+   */
+  const seeded = useRef<Set<string> | null>(null)
+  useEffect(() => {
+    const seed = seeded.current
+    if (seed && swept.length === seed.size && swept.every(it => seed.has(it.id))) return
+    saveSwept(swept)
+  }, [swept])
   useEffect(() => { saveGone(gone) }, [gone])
 
   const sweptIds = useMemo(() => new Set(swept.map(it => it.id)), [swept])
@@ -222,6 +245,7 @@ export default function App() {
       .sort((a, b) => toDate(a.entry.timestamp).getTime() - toDate(b.entry.timestamp).getTime())
       .slice(0, SEED_N)
     if (!chosen.length) return
+    seeded.current = new Set(chosen.map(c => c.entry.id))
     setSwept(chosen.map(c => ({ id: c.entry.id, sweptAt: t - HOLD_DAYS * DAY / 2 })))
   }, [notes.on, view, swept.length, t])
 
