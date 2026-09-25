@@ -111,7 +111,7 @@ genuinely ship, and that was built with care.
 - `src/data/history.private.json` is my real dictation history. It is gitignored and never enters
   a public repo, a deploy, or a screenshot that leaves my machine. Discovery used Flow's own backup
   copy, read-only; Flow's live database was never opened.
-- `src/data/history.sample.json` is what the public build runs on: 874 invented entries generated
+- `src/data/history.sample.json` is what the public build runs on: 1,470 invented entries generated
   to the real distribution of length, app, and category, with no real sentences.
 - A production build made on my machine would embed the private file. Deploys build from the repo.
 
