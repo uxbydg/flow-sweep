@@ -280,10 +280,18 @@ Daniel, preparing the opening shot: *"Right now there's only one transcript line
 away during the Sweep. I want at least five to show how big of a transformation it is. Three blank
 ones and two with copy, so that as soon as I hit Sweep there's a giant leap."*
 
-**Five rows are seeded at the head of `history.private.json`**: three empties (4.2s, 9.8s and 2.6s
-recorded, no text) and two cut-offs under twenty characters that stop on a dangling word, "Can we
-pull the" and "So the next is". They sit above the newest real entry, so the first thing on screen
-is five rows that all leave together.
+**Five rows are seeded into `history.private.json`**: three empties (4.2s, 9.8s and 2.6s recorded,
+no text) and two cut-offs under twenty characters that stop on a dangling word, "Can we pull the"
+and "So the next is".
+
+⚑ **Scattered through the newest twelve, not stacked on top.** They land at positions 6, 10, 12, 14
+and 16. Daniel's call: "I want them placed randomly within the first 15 logs from the top." Five in a
+block reads as staged; five interleaved reads as a history, and the sweep is better for it because
+rows leave from BETWEEN survivors and the gaps close behind them.
+
+⚑ A sixth row goes with them and it is real: **"In my application"** at position 4 is a genuine
+cut-off from his own history. The opening shot is five staged and one real, six rows leaving the
+first eighteen.
 
 ⚑⚑ **Every one of them carries `"demoSeed": true` in the data.** They are identifiable, countable
 and removable with one filter, which is the difference between staging a shot and quietly padding a
