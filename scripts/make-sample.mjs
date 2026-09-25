@@ -3,8 +3,12 @@
 import { writeFileSync } from 'node:fs'
 const rnd = (n) => Math.floor(Math.random() * n)
 const pick = (a) => a[rnd(a.length)]
-const APPS = [['com.apple.Terminal', 705], ['com.apple.MobileSMS', 52], [null, 50], ['com.google.Chrome', 20],
-  ['com.electron.wispr-flow', 16], ['com.figma.Desktop', 10], ['com.anthropic.claudefordesktop', 6], ['com.apple.Notes', 5]]
+// ⚑ Re-derived 25 September from the 1,470-entry export, so the public build's
+// shape still matches the real history the notes describe. Counted straight off
+// `history.private.json`; do not hand-edit these.
+const APPS = [['com.apple.Terminal', 1230], [null, 83], ['com.apple.MobileSMS', 61], ['com.google.Chrome', 41],
+  ['com.electron.wispr-flow', 26], ['com.figma.Desktop', 10], ['com.anthropic.claudefordesktop', 7],
+  ['com.apple.Notes', 5], ['com.apple.finder', 5], ['com.apple.mail', 2]]
 const appPool = APPS.flatMap(([a, n]) => Array(n).fill(a))
 // Readable, invented dictation: nothing here is a real entry. Sentences are composed from a bank so
 // long rows read like someone talking to a coding agent, a colleague, or a friend, not word salad.
@@ -56,9 +60,11 @@ const SHORT = ['Hey.', 'Yep.', 'Sure.', 'Okay!', 'Thanks so much.', 'On it.', 'S
 const CUT = ['Can we', 'I think the', 'So the', 'Let me', 'and then', 'Make sure to', 'Okay, so', 'Take the', 'Th', 'Ac', 'to', 'the', ',', '...', 'Bu', 'What about the', 'Is there a', 'We should', 'Before you', 'I was going to', 'Send me the', 'Do we have', 'Check the', 'Okay', 'Right now', 'One more', 'Actually', 'Hold on', 'Wait, is', 'Then we', 'The other', 'In the', 'For the', 'Maybe we', 'Could you', 'It looks like', 'Not the', 'On the', 'Try the', 'When the', 'So I', 'Yes, but', 'No, the', 'Hmm', 'Oh, the', 'And the', 'Se', 'Wh', 'Pro', 'Ma']
 const FLAGS = ['Never mind, scratch that.', 'Oops, ignore that one.', 'Scratch that, wrong window.', 'Clean up, not what I meant.', 'Never mind.', 'Delete that, starting over.']
 const sentence = (n) => { let s = pick(SENTENCES); while (s.split(' ').length < n) s += (Math.random() < 0.3 ? '\n\n' : ' ') + pick(SENTENCES); return s }
-const out = []; const start = Date.UTC(2026, 7, 8, 1, 0, 0); const span = 35 * 864e5
-for (let i = 0; i < 874; i++) {
-  const t = new Date(start + Math.floor(i / 874 * span) + rnd(3600e3)).toISOString().replace('T', ' ').replace('Z', ' +00:00')
+// ⚑ N and the span track the real export: 1,470 entries, 8 August to 24 September 2026.
+const N = 1470
+const out = []; const start = Date.UTC(2026, 7, 8, 1, 0, 0); const span = 47 * 864e5
+for (let i = 0; i < N; i++) {
+  const t = new Date(start + Math.floor(i / N * span) + rnd(3600e3)).toISOString().replace('T', ' ').replace('Z', ' +00:00')
   const app = pick(appPool)
   let text = '', status = 'formatted', duration = 0
   const r = Math.random()

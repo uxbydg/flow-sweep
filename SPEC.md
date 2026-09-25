@@ -2,29 +2,31 @@
 
 > **Read the dated sections at the bottom first.** They supersede the top: the four-state flow with a
 > Summary sheet became one card the broom unfolds above the list (14 September), and the numbers were
-> re-run against the code on 15 September. Current counts on the real 874: 97 empty, 40 cut off (12 sure,
-> 28 asked about), 1 marked for removal, 43 short replies, 3 to retry; 122 preselected, 138 candidates,
-> about 1 in 6.
+> re-run against the code on 15 September. ⛑ **RE-EXPORTED 23 September and renumbered 25 September
+> before recording.** Current counts on the real **1,470** (8 August to 24 September 2026): **145 empty,
+> 48 cut off (15 sure, 33 asked about), 1 marked for removal, 64 short replies, 4 to retry; 174
+> preselected, 194 candidates, about 1 in 8.** Verified against the running app, not computed by hand.
+> The September export of 874 is kept as `history.private.874.json` and every count below is the new one.
 
 A concept for Wispr Flow's history view: find the entries that are almost certainly accidents,
 show them in one place with the reason and the confidence, sweep them in one motion, and keep
-them somewhere you can get them back from. Built against one real user's 874 entries.
+them somewhere you can get them back from. Built against one real user's 1,470 entries.
 
 ## The four sections, from the data
 
-| Section | Rule | Real history (874) | Selected by default |
+| Section | Rule | Real history (1,470) | Selected by default |
 |---|---|---|---|
-| **Empty** | no text after trim, or Flow's own status is `dismissed` / `no_audio` / `empty` | 100 | yes |
-| **Cut off** | under 20 characters and the thought did not finish: punctuation only, stops on a comma, on a dangling word ("the", "to", "is"), or mid-word ("pa", "re-b") | 40 (24 selected, 16 shown as borderline) | when confidence ≥ 0.60 |
+| **Empty** | no text after trim, or Flow's own status is `dismissed` / `no_audio` / `empty` | 145 | yes |
+| **Cut off** | under 20 characters and the thought did not finish: punctuation only, stops on a comma, on a dangling word ("the", "to", "is"), or mid-word ("pa", "re-b") | 48 (15 selected, 33 shown as borderline) | when confidence ≥ 0.60 |
 | **Flagged by you** | the entry names its own fate ("never mind", "scratch that", "oops"...) at its start, or anywhere in an entry under 40 chars | 1 | yes |
-| **Short replies** | under 20 characters and finished: ends in . ! or ? and not on a dangling word | 43 | **never**; listed last, collapsed |
+| **Short replies** | under 20 characters and finished: ends in . ! or ? and not on a dangling word | 64 | **never**; listed last, collapsed |
 
-Dropped: near-duplicate retries (1 case in 874). Not built: "not words" (none found).
+Dropped: near-duplicate retries (1 case in 1,470). Not built: "not words" (none found).
 
 ## Completeness decides, not the app (revised 14 September)
 
 The first version weighted confidence by target app and treated Terminal as the most accident-prone.
-Daniel's real Short list proved it inverted: "Do it." ×9 and "Run it." ×5 into the terminal are the
+Daniel's real Short list proved it inverted: "Do it." ×13 and "Run it." ×5 into the terminal are the
 most deliberate entries in the history (Flow's own Insights names his catchphrase as "Can we run
 the agent?"), while "Watch the", "Don't d" and "The About Me pa" are the hotkey released mid-sentence.
 **Whether the thought finished separates them; length and app do not.** The app survives as one small
@@ -33,7 +35,7 @@ adjustment: cut-off confidence × 0.9 in Messages, where people text in fragment
 Confidence: Empty 0.98 (0.90 if over 30 s recorded). Punctuation only 0.97. Mid-word 0.90–0.92,
 dangling word 0.90, trailing comma 0.85, single fragment ≤3 chars 0.85. No ending but nothing visibly
 broken ("Excel", "Run it", "right now") 0.50: shown, not selected. Flagged 0.70. Short reply 0.20.
-Result: **138 candidates, 122 selected, about 1 in 6** (was 145 selected, 1 in 5, before the revision).
+Result: **194 candidates, 174 selected, about 1 in 8**.
 ⚑ Verified against the running app on 25 September: the card says "Flow will sweep 122 transcripts",
 the broom says 138 to review, and the strip reads Empty 97, Cut off 12, Marked for removal 1. An
 earlier draft of this line said 141 and 125, which were the counts before the 15 September re-run.
@@ -80,7 +82,7 @@ length, app, and category, no real text. Counts in this spec are from the real d
 
 ## What the write-up says that the UI cannot
 
-Empty entries average 5.6 s of recording (max 152 s). They are not brief hotkey taps; they are
+Empty entries average 5.9 s of recording (max 152 s). They are not brief hotkey taps; they are
 recordings that returned no text. The taps are the under-20 set (2.6 s recorded, 1.6 s of speech).
 Two failures, two upstream causes. The sweep treats the symptom; the store does not say why the
 text did not come back.

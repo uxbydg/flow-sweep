@@ -21,16 +21,17 @@ import type { Note } from './types'
  *
  *   1. **Flow's own documentation**, quoted exactly: "deleted transcripts
  *      cannot be recovered."
- *   2. **Daniel's own exported history**, 874 entries, stated as his own and
+ *   2. **Daniel's own exported history**, 1,470 entries, stated as his own and
  *      never dressed up as research. He is one user. That is said out loud.
  *
  * ⚑ Where a customer quote is genuinely missing, the note says so rather than
  * skipping the field. A visible gap is worth more than a filled one that
  * cannot be checked.
  *
- * ⚑ Counts are the 15 September re-run against the code, which supersedes the
- * top of SPEC.md: 97 empty, 40 cut off, 1 flagged, 43 short replies, 3 to
- * retry, 122 preselected, 138 candidates, about 1 in 6.
+ * ⚑⚑ Counts are the **23 September re-export**, renumbered 25 September before
+ * recording and read off the running app rather than computed by hand:
+ * 1,470 entries, 145 empty, 48 cut off, 1 flagged, 64 short replies, 4 to
+ * retry, 174 preselected, 194 candidates, about 1 in 8.
  */
 
 /** Sweep's states, as far as the notes layer is concerned. */
@@ -63,9 +64,9 @@ export const NOTES: Note<SweepMode>[] = [
     title: 'The number on the button is the number in the sentence',
     problem: {
       kind: 'sourced',
-      text: '874 entries, and about one in six is an accident I never meant to keep.',
+      text: '1,470 entries, and about one in eight is an accident I never meant to keep.',
       source: 'Daniel’s own exported history',
-      note: '⚑ One user, and it is stated as one user. 97 empty, 40 cut off, 1 flagged by him, on the 15 September re-run.',
+      note: '⚑ One user, and it is stated as one user. 145 empty, 48 cut off, 1 flagged by him, on the 23 September export.',
     },
     decision:
       'Say the count in words before anything happens, and put the same number on the button that performs it. Rejected: a summary that counts everything found while the button acts on a smaller set, which is the ordinary way this goes wrong and which makes the headline a number nobody can reconcile.',
@@ -82,7 +83,7 @@ export const NOTES: Note<SweepMode>[] = [
     title: 'What is deliberately not in the strip',
     problem: {
       kind: 'sourced',
-      text: '43 of the 874 are short replies: finished thoughts, under twenty characters, that a length rule would have swept.',
+      text: '64 of the 1,470 are short replies: finished thoughts, under twenty characters, that a length rule would have swept.',
       source: 'Daniel’s own exported history',
     },
     decision:
@@ -104,13 +105,13 @@ export const NOTES: Note<SweepMode>[] = [
     title: 'The rule I got backwards, and the data that caught it',
     problem: {
       kind: 'sourced',
-      text: '"Do it." appears nine times and "Run it." five, every one of them dictated into the terminal where Claude Code runs, and they are the most deliberate entries in the whole history.',
+      text: '"Do it." appears thirteen times and "Run it." five, every one of them dictated into the terminal where Claude Code runs, and they are the most deliberate entries in the whole history.',
       source: 'Daniel’s own exported history',
       note: 'Flow’s own Insights names his catchphrase as "Can we run the agent?", from the same data.',
     },
     decision:
       'Ask about the doubtful rather than deciding for them: a row of chips, filled means it goes, and the polarity is stated in words above them. ⚡ And the classifier underneath changed. The first version weighted confidence by target app and treated Terminal as the most accident-prone place a person could dictate into. His real history inverted it. Whether the thought FINISHED separates an accident from an instruction; length and app do not. The app survives as one small adjustment, cut-off confidence times 0.9 in Messages, where people really do text in fragments.',
-    mine: 'Running the rule against my own 874 instead of shipping it because it sounded right, and then accepting the answer when it came back inverted.',
+    mine: 'Running the rule against my own 1,470 instead of shipping it because it sounded right, and then accepting the answer when it came back inverted.',
     claude: 'Both classifiers, the confidence model, and the re-run that produced the corrected counts.',
     impact:
       'A classifier that is confidently wrong about a power user is worse than one that asks, because the power user is the person whose history is large enough for this feature to matter and the person most likely to tell other people it deleted their work.',
@@ -142,7 +143,7 @@ export const NOTES: Note<SweepMode>[] = [
     title: 'Nobody reads "No text" a hundred times',
     problem: {
       kind: 'sourced',
-      text: '97 of the swept rows are empty, and an empty row has nothing to recognise it by.',
+      text: '145 of the swept rows are empty, and an empty row has nothing to recognise it by.',
       source: 'Daniel’s own exported history',
     },
     decision:
@@ -163,7 +164,7 @@ export const NOTES: Note<SweepMode>[] = [
       /* ⚑ A standfirst on the last page has one job: say what is on the page
          and in what order. The old one counted things and stopped. */
       lede:
-        'Six decisions, one running concept, one real history of 874 transcripts. Below: what the role asks for and which part of this answers it, then what this does not show.',
+        'Six decisions, one running concept, one real history of 1,470 transcripts. Below: what the role asks for and which part of this answers it, then what this does not show.',
       mapped: [
         {
           asks: 'Design and build, rather than hand off.',
@@ -193,7 +194,7 @@ export const NOTES: Note<SweepMode>[] = [
         'It cannot show working inside your constraints, your telemetry, and your roadmap.',
       ],
       provenance: [
-        'The counts throughout come from one real Wispr Flow export of 874 entries, Daniel\u2019s own, held locally and gitignored, with no audio.',
+        'The counts throughout come from one real Wispr Flow export of 1,470 entries, 8 August to 24 September 2026, Daniel\u2019s own, held locally and gitignored, with no audio.',
         'The public build reads a generated sample matched to the real distribution of length, app, and category, with no real text in it, so nothing dictated in private is published.',
         'And the honest limit: one user is not research. These numbers describe one history well and nobody else\u2019s at all, which is why every rule here is offered as something to test rather than something settled.',
       ],

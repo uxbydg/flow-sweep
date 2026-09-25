@@ -5,7 +5,7 @@ is redrawn by hand for fidelity; no file of Flow's (logo, font, Lottie) ships in
 
 One screen, one action: find the transcripts that are almost certainly accidents, show them with the
 reason, sweep them in one motion, and keep them somewhere they can come back from. Built against my
-own 874 real Flow entries, and published on a synthetic set that matches their distribution.
+own 1,470 real Flow entries, and published on a synthetic set that matches their distribution.
 
 **Stack:** React 19, TypeScript, Vite, Motion, Lucide, SCSS modules. Flow's own stack, on purpose.
 
@@ -22,14 +22,14 @@ own 874 real Flow entries, and published on a synthetic set that matches their d
 
 ## What the data said
 
-Flow keeps every dictation, including the ones that went nowhere. In my 874 entries from 8 August to
-11 September 2026:
+Flow keeps every dictation, including the ones that went nowhere. In my 1,470 entries from 8 August to
+24 September 2026:
 
-- **97 were empty**, 40 were **cut off mid-thought**, 1 was **marked for removal** in the dictation
-  itself ("never mind"), and 43 were **short replies** like "Do it." that are finished thoughts.
-- **About 1 in 6 entries is an accident.** 138 candidates; 122 preselected at the default threshold.
-- **Empties are not brief hotkey taps.** They average 5.6 seconds of recording, up to 152 seconds:
-  recordings that returned no text. The taps are the under-20-character set, 2.6 seconds recorded.
+- **145 were empty**, 48 were **cut off mid-thought**, 1 was **marked for removal** in the dictation
+  itself ("never mind"), and 64 were **short replies** like "Do it." that are finished thoughts.
+- **About 1 in 8 entries is an accident.** 194 candidates; 174 preselected at the default threshold.
+- **Empties are not brief hotkey taps.** They average 5.9 seconds of recording, up to 152 seconds:
+  recordings that returned no text. The taps are the under-20-character set, 2.7 seconds recorded.
   Two failures, two upstream causes. The store does not say why the text did not come back.
 - **The retry pattern occurs once.** Dropped.
 - **Storage is not the value.** All audio is 597 MB; the under-20 set carries 16 MB. The sweep buys a
@@ -42,7 +42,7 @@ Flow keeps every dictation, including the ones that went nowhere. In my 874 entr
 
 **Whether the thought finished decides, not where it went.** The first classifier weighted
 confidence by the target app and treated Terminal as the most accident-prone place. My own Short
-list proved it inverted: "Do it." nine times and "Run it." five times into the terminal are the
+list proved it inverted: "Do it." thirteen times and "Run it." five times into the terminal are the
 most deliberate entries in the history, while "Watch the", "Don't d", and "The About Me pa" are the
 hotkey released mid-sentence. Length and app do not separate them; completeness does. The app
 survives as one small adjustment: cut-off confidence is nudged down in Messages, where people text
