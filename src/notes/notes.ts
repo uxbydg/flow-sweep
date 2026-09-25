@@ -104,7 +104,7 @@ export const NOTES: Note<SweepMode>[] = [
     title: 'The rule I got backwards, and the data that caught it',
     problem: {
       kind: 'sourced',
-      text: '"Do it." appears thirteen times and "Run it." seven, all into Claude Code, and they are the most deliberate entries in the whole history.',
+      text: '"Do it." appears nine times and "Run it." five, every one of them dictated into the terminal where Claude Code runs, and they are the most deliberate entries in the whole history.',
       source: 'Daniel’s own exported history',
       note: 'Flow’s own Insights names his catchphrase as "Can we run the agent?", from the same data.',
     },

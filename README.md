@@ -28,7 +28,7 @@ Flow keeps every dictation, including the ones that went nowhere. In my 874 entr
 - **97 were empty**, 40 were **cut off mid-thought**, 1 was **marked for removal** in the dictation
   itself ("never mind"), and 43 were **short replies** like "Do it." that are finished thoughts.
 - **About 1 in 6 entries is an accident.** 138 candidates; 122 preselected at the default threshold.
-- **Empties are not brief hotkey taps.** They average 8.5 seconds of recording, up to 152 seconds:
+- **Empties are not brief hotkey taps.** They average 5.6 seconds of recording, up to 152 seconds:
   recordings that returned no text. The taps are the under-20-character set, 2.6 seconds recorded.
   Two failures, two upstream causes. The store does not say why the text did not come back.
 - **The retry pattern occurs once.** Dropped.
@@ -42,7 +42,7 @@ Flow keeps every dictation, including the ones that went nowhere. In my 874 entr
 
 **Whether the thought finished decides, not where it went.** The first classifier weighted
 confidence by the target app and treated Terminal as the most accident-prone place. My own Short
-list proved it inverted: "Do it." thirteen times and "Run it." seven times into Claude Code are the
+list proved it inverted: "Do it." nine times and "Run it." five times into the terminal are the
 most deliberate entries in the history, while "Watch the", "Don't d", and "The About Me pa" are the
 hotkey released mid-sentence. Length and app do not separate them; completeness does. The app
 survives as one small adjustment: cut-off confidence is nudged down in Messages, where people text

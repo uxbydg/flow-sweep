@@ -24,7 +24,7 @@ Dropped: near-duplicate retries (1 case in 874). Not built: "not words" (none fo
 ## Completeness decides, not the app (revised 14 September)
 
 The first version weighted confidence by target app and treated Terminal as the most accident-prone.
-Daniel's real Short list proved it inverted: "Do it." ×13 and "Run it." ×7 into Claude Code are the
+Daniel's real Short list proved it inverted: "Do it." ×9 and "Run it." ×5 into the terminal are the
 most deliberate entries in the history (Flow's own Insights names his catchphrase as "Can we run
 the agent?"), while "Watch the", "Don't d" and "The About Me pa" are the hotkey released mid-sentence.
 **Whether the thought finished separates them; length and app do not.** The app survives as one small
@@ -33,7 +33,10 @@ adjustment: cut-off confidence × 0.9 in Messages, where people text in fragment
 Confidence: Empty 0.98 (0.90 if over 30 s recorded). Punctuation only 0.97. Mid-word 0.90–0.92,
 dangling word 0.90, trailing comma 0.85, single fragment ≤3 chars 0.85. No ending but nothing visibly
 broken ("Excel", "Run it", "right now") 0.50: shown, not selected. Flagged 0.70. Short reply 0.20.
-Result: 141 candidates, **125 selected, about 1 in 6** (was 145 selected, 1 in 5, before the revision).
+Result: **138 candidates, 122 selected, about 1 in 6** (was 145 selected, 1 in 5, before the revision).
+⚑ Verified against the running app on 25 September: the card says "Flow will sweep 122 transcripts",
+the broom says 138 to review, and the strip reads Empty 97, Cut off 12, Marked for removal 1. An
+earlier draft of this line said 141 and 125, which were the counts before the 15 September re-run.
 
 ## The four states
 
@@ -77,7 +80,7 @@ length, app, and category, no real text. Counts in this spec are from the real d
 
 ## What the write-up says that the UI cannot
 
-Empty entries average 8.5 s of recording (max 152 s). They are not brief hotkey taps; they are
+Empty entries average 5.6 s of recording (max 152 s). They are not brief hotkey taps; they are
 recordings that returned no text. The taps are the under-20 set (2.6 s recorded, 1.6 s of speech).
 Two failures, two upstream causes. The sweep treats the symptom; the store does not say why the
 text did not come back.
