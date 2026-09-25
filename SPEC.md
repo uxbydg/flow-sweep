@@ -1,11 +1,11 @@
-# Transcript Sweep — spec
+# Sweep — spec
 
 > **Read the dated sections at the bottom first.** They supersede the top: the four-state flow with a
 > Summary sheet became one card the broom unfolds above the list (14 September), and the numbers were
 > re-run against the code on 15 September. ⛑ **RE-EXPORTED 23 September and renumbered 25 September
-> before recording.** Current counts on the real **1,470** (8 August to 24 September 2026): **145 empty,
-> 48 cut off (15 sure, 33 asked about), 1 marked for removal, 64 short replies, 4 to retry; 174
-> preselected, 194 candidates, about 1 in 8.** Verified against the running app, not computed by hand.
+> before recording.** Current counts on the real **1,470** (8 August to 24 September 2026): **148 empty,
+> 50 cut off (17 sure, 33 asked about), 1 marked for removal, 64 short replies, 4 to retry; 179
+> preselected, 199 candidates, about 1 in 8.** ⚑ Includes five demo rows, see below. Verified against the running app, not computed by hand.
 > The September export of 874 is kept as `history.private.874.json` and every count below is the new one.
 
 A concept for Wispr Flow's history view: find the entries you never meant to keep,
@@ -16,7 +16,7 @@ them somewhere you can get them back from. Built against one real user's 1,470 e
 
 | Section | Rule | Real history (1,470) | Selected by default |
 |---|---|---|---|
-| **Empty** | no text after trim, or Flow's own status is `dismissed` / `no_audio` / `empty` | 145 | yes |
+| **Empty** | no text after trim, or Flow's own status is `dismissed` / `no_audio` / `empty` | 148 | yes |
 | **Cut off** | under 20 characters and the thought did not finish: punctuation only, stops on a comma, on a dangling word ("the", "to", "is"), or mid-word ("pa", "re-b") | 48 (15 selected, 33 shown as borderline) | when confidence ≥ 0.60 |
 | **Flagged by you** | the entry names its own fate ("never mind", "scratch that", "oops"...) at its start, or anywhere in an entry under 40 chars | 1 | yes |
 | **Short replies** | under 20 characters and finished: ends in . ! or ? and not on a dangling word | 64 | **never**; listed last, collapsed |
@@ -35,7 +35,7 @@ adjustment: cut-off confidence × 0.9 in Messages, where people text in fragment
 Confidence: Empty 0.98 (0.90 if over 30 s recorded). Punctuation only 0.97. Mid-word 0.90–0.92,
 dangling word 0.90, trailing comma 0.85, single fragment ≤3 chars 0.85. No ending but nothing visibly
 broken ("Excel", "Run it", "right now") 0.50: shown, not selected. Flagged 0.70. Short reply 0.20.
-Result: **194 candidates, 174 selected, about 1 in 8**.
+Result: **199 candidates, 179 selected, about 1 in 8**.
 ⚑ Verified against the running app on 25 September: the card says "Flow will sweep 122 transcripts",
 the broom says 138 to review, and the strip reads Empty 97, Cut off 12, Marked for removal 1. An
 earlier draft of this line said 141 and 125, which were the counts before the 15 September re-run.
@@ -273,3 +273,26 @@ Flow's own failures carries an edge nobody intended.
 
 ⚑ Two uses survive on purpose: `detect.ts` line 13 and note 1, where the word appears inside an
 argument about what the classifier is deciding rather than as a label for the rows.
+
+## ⛑ Five demo rows at the top of the local history, 25 September 2026
+
+Daniel, preparing the opening shot: *"Right now there's only one transcript line that gets animated
+away during the Sweep. I want at least five to show how big of a transformation it is. Three blank
+ones and two with copy, so that as soon as I hit Sweep there's a giant leap."*
+
+**Five rows are seeded at the head of `history.private.json`**: three empties (4.2s, 9.8s and 2.6s
+recorded, no text) and two cut-offs under twenty characters that stop on a dangling word, "Can we
+pull the" and "So the next is". They sit above the newest real entry, so the first thing on screen
+is five rows that all leave together.
+
+⚑⚑ **Every one of them carries `"demoSeed": true` in the data.** They are identifiable, countable
+and removable with one filter, which is the difference between staging a shot and quietly padding a
+dataset. The 1,470 real entries are untouched and the ratio does not move: 199 candidates of 1,475
+is still about one in eight.
+
+⚑ **They exist because the opening five seconds has to show the product working, and one row leaving
+a long list shows nothing.** Everything downstream of the sweep, every count, every rule and every
+design note, still rests on the real export.
+
+⚑ The public build is unaffected: it runs on `history.sample.json`, which has always been generated
+and says so.

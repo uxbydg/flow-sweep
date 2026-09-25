@@ -1,4 +1,4 @@
-# Transcript Sweep
+# Sweep
 
 A concept for Wispr Flow's History view. Not affiliated with Wispr. Flow's chrome, its mark included,
 is redrawn by hand for fidelity; no file of Flow's (logo, font, Lottie) ships in this repo.
@@ -25,9 +25,9 @@ own 1,470 real Flow entries, and published on a synthetic set that matches their
 Flow keeps every dictation, including the ones that went nowhere. In my 1,470 entries from 8 August to
 24 September 2026:
 
-- **145 were empty**, 48 were **cut off mid-thought**, 1 was **marked for removal** in the dictation
+- **148 were empty**, 50 were **cut off mid-thought**, 1 was **marked for removal** in the dictation
   itself ("never mind"), and 64 were **short replies** like "Do it." that are finished thoughts.
-- **About 1 in 8 entries is one you never meant to keep.** 194 candidates; 174 preselected at the default threshold.
+- **About 1 in 8 entries is one you never meant to keep.** 199 candidates; 179 preselected at the default threshold.
 - **Empties are not brief hotkey taps.** They average 5.9 seconds of recording, up to 152 seconds:
   recordings that returned no text. The taps are the under-20-character set, 2.7 seconds recorded.
   Two failures, two upstream causes. The store does not say why the text did not come back.

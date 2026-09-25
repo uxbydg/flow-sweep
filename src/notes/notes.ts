@@ -30,8 +30,10 @@ import type { Note } from './types'
  *
  * ⚑⚑ Counts are the **23 September re-export**, renumbered 25 September before
  * recording and read off the running app rather than computed by hand:
- * 1,470 entries, 145 empty, 48 cut off, 1 flagged, 64 short replies, 4 to
- * retry, 174 preselected, 194 candidates, about 1 in 8.
+ * 1,475 entries, 148 empty, 50 cut off, 1 flagged, 64 short replies, 4 to
+ * retry, 179 preselected, 199 candidates, about 1 in 8. ⚡ Five of those are
+ * demo rows seeded at the head of the list so the opening sweep shows more
+ * than one row leaving; they carry demoSeed:true and SPEC.md names them.
  */
 
 /** Sweep's states, as far as the notes layer is concerned. */
@@ -66,7 +68,7 @@ export const NOTES: Note<SweepMode>[] = [
       kind: 'sourced',
       text: '1,470 entries, and about one in eight is a dictation I never meant to keep.',
       source: 'Daniel’s own exported history',
-      note: '⚑ One user, and it is stated as one user. 145 empty, 48 cut off, 1 flagged by him, on the 23 September export.',
+      note: '⚑ One user, and it is stated as one user. 148 empty, 50 cut off, 1 flagged by him, on the 23 September export.',
     },
     decision:
       'Say the count in words before anything happens, and put the same number on the button that performs it. Rejected: a summary that counts everything found while the button acts on a smaller set, which is the ordinary way this goes wrong and which makes the headline a number nobody can reconcile.',
@@ -143,7 +145,7 @@ export const NOTES: Note<SweepMode>[] = [
     title: 'Nobody reads "No text" a hundred times',
     problem: {
       kind: 'sourced',
-      text: '145 of the swept rows are empty, and an empty row has nothing to recognise it by.',
+      text: '148 of the swept rows are empty, and an empty row has nothing to recognise it by.',
       source: 'Daniel’s own exported history',
     },
     decision:
