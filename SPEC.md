@@ -8,7 +8,7 @@
 > preselected, 194 candidates, about 1 in 8.** Verified against the running app, not computed by hand.
 > The September export of 874 is kept as `history.private.874.json` and every count below is the new one.
 
-A concept for Wispr Flow's history view: find the entries that are almost certainly accidents,
+A concept for Wispr Flow's history view: find the entries you never meant to keep,
 show them in one place with the reason and the confidence, sweep them in one motion, and keep
 them somewhere you can get them back from. Built against one real user's 1,470 entries.
 
@@ -171,10 +171,10 @@ chore card above the person's own words is noise. The card is what the broom OPE
 place above the day list, and folds away on Sweep or Not now. No pane, no modal.
 
 Two tiers, readable in 30 seconds:
-1. **What Flow decided.** "Flow will sweep 106 transcripts that are certainly accidents." Empty,
+1. **What Flow decided.** "Flow will sweep 106 transcripts." Empty,
    cut off at ≥ 0.90 (punctuation only, mid-word), and the ones the person flagged. Counted, not
    listed; a "Show" for the sceptic.
-2. **The one question.** "Are these accidents too?" The cut-offs under 0.90 as toggle chips, least
+2. **The one question.** "Should these go too?" The cut-offs under 0.90 as toggle chips, least
    sure first. They are all under 20 characters, so chips scan where rows do not. Filled teal = goes,
    outline = stays; the classifier's default fills the ones at 0.60 and above.
 Then one line for Retry (long empties) and one for short replies, and two buttons: Not now, Sweep N.
@@ -252,3 +252,24 @@ finished artifact, not a library consumer.
 
 ### Anchors
 `broom` and `cell` in `App.tsx`; `count`, `strip`, `ask`, and `restore` in `SweepCard.tsx`.
+
+## ⛑ "Accidents" retired, 25 September 2026
+
+Daniel, before recording: *"We're not necessarily calling them just accidents. What's a word for the
+specific transcript logs we're sweeping away?"*
+
+**The word described three-quarters of them wrongly.** 145 of the 194 are EMPTIES, and an empty is
+Flow's transcription returning no text, not the user's slip. This spec already said as much: "Two
+failures, two upstream causes." Calling those accidents is inaccurate, and saying it to Flow about
+Flow's own failures carries an edge nobody intended.
+
+- Collective term: **"dictations you never meant to keep."** True of all three buckets, blames
+  nobody, and it is the actual selection criterion.
+- UI heading: **"Should these go too?"**, was "Are these accidents too?" It asks the real question
+  and drops the diagnosis.
+- ⚑ The three bucket names stay exactly as they are. **Empty**, **Cut off** and **Marked for
+  removal** are precise about what happened without assigning fault to anybody, which is why they
+  were right from the start and the collective noun was not.
+
+⚑ Two uses survive on purpose: `detect.ts` line 13 and note 1, where the word appears inside an
+argument about what the classifier is deciding rather than as a label for the rows.

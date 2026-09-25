@@ -92,7 +92,7 @@ export function SweepCard({ cands, sum, selected, setMany, onSweep, onClose, onS
         <div data-note="ask">
           <div className={s.sweepAsk}>
             {/* polarity in words: filled chips are the ones that go */}
-            <h4>Are these accidents too? <small>{doubtOn} of {doubtful.length} will go</small></h4>
+            <h4>Should these go too? <small>{doubtOn} of {doubtful.length} will go</small></h4>
             <label className={s.selectAll}>
               <input type="checkbox" className={s.check} checked={doubtOn === doubtful.length} aria-label="Sweep all of these"
                 ref={el => { if (el) el.indeterminate = doubtOn > 0 && doubtOn < doubtful.length }}

@@ -64,7 +64,7 @@ export const NOTES: Note<SweepMode>[] = [
     title: 'The number on the button is the number in the sentence',
     problem: {
       kind: 'sourced',
-      text: '1,470 entries, and about one in eight is an accident I never meant to keep.',
+      text: '1,470 entries, and about one in eight is a dictation I never meant to keep.',
       source: 'Daniel’s own exported history',
       note: '⚑ One user, and it is stated as one user. 145 empty, 48 cut off, 1 flagged by him, on the 23 September export.',
     },
@@ -110,7 +110,7 @@ export const NOTES: Note<SweepMode>[] = [
       note: 'Flow’s own Insights names his catchphrase as "Can we run the agent?", from the same data.',
     },
     decision:
-      'Ask about the doubtful rather than deciding for them: a row of chips, filled means it goes, and the polarity is stated in words above them. ⚡ And the classifier underneath changed. The first version weighted confidence by target app and treated Terminal as the most accident-prone place a person could dictate into. His real history inverted it. Whether the thought FINISHED separates an accident from an instruction; length and app do not. The app survives as one small adjustment, cut-off confidence times 0.9 in Messages, where people really do text in fragments.',
+      'Ask about the doubtful rather than deciding for them: a row of chips, filled means it goes, and the polarity is stated in words above them. \u26a1 The heading asks \u201cShould these go too?\u201d rather than \u201cAre these accidents too?\u201d: 145 of the 194 are empties, which is Flow\u2019s transcription returning nothing rather than anybody\u2019s slip, so diagnosing them as accidents was both inaccurate and quietly rude about the product. ⚡ And the classifier underneath changed. The first version weighted confidence by target app and treated Terminal as the most accident-prone place a person could dictate into. His real history inverted it. Whether the thought FINISHED separates an accident from an instruction; length and app do not. The app survives as one small adjustment, cut-off confidence times 0.9 in Messages, where people really do text in fragments.',
     mine: 'Running the rule against my own 1,470 instead of shipping it because it sounded right, and then accepting the answer when it came back inverted.',
     claude: 'Both classifiers, the confidence model, and the re-run that produced the corrected counts.',
     impact:
