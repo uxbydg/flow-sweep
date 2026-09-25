@@ -59,7 +59,11 @@ earlier draft of this line said 141 and 125, which were the counts before the 15
 - The card unfolds above the list on a height transition (330 ms, one easing) so the rows slide with
   it instead of jumping; the fold closes first on Sweep, then the swept rows lift out (y −6, opacity 0,
   220 ms, staggered 18 ms, capped at 12 rows) while the kept rows reflow.
-- Restore lifts a row out of the holding cell sideways (x +12); it is not yet the exact mirror of sweep.
+- ⛑ **Sweep and restore are now mirrors (25 September).** A swept row is plucked out to the LEFT
+  (x −34, opacity 0, 240 ms, ease-in, staggered 18 ms, capped at 12 rows) and a restored row comes
+  back from the left (x +12). Sweep used to lift (y −6), so the two halves of the same promise moved
+  on different axes. ⚑ The easing is ease-IN on the way out: a pluck accelerates away from the
+  finger, where easing out at the end would read as a slide.
 - Reduced motion: Motion honours the OS setting (MotionConfig reducedMotion="user") and the CSS
   transitions are cancelled by the global rule.
 - While the tab is hidden the list skips its animations, because browsers pause the animation clock

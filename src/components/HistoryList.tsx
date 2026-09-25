@@ -99,10 +99,28 @@ function Row({ e, i, onSweep, onRetry, retrying, animate }: { e: Entry; i: numbe
   const retry = () => { setMenu(false); row.current?.focus(); onRetry() }
 
   return (
-    // Swept rows lift out; popLayout lets the kept rows reflow underneath them. The stagger is
-    // capped so a big sweep still ends quickly.
+    /**
+     * ⚑⚑ SWEPT ROWS ARE PLUCKED OUT SIDEWAYS, LEFT.
+     *
+     * Daniel, watching it: "It would be nice to do a motion where it actually
+     * slides to the left and disappears, like someone put their finger and
+     * plucked it out."
+     *
+     * He is right, and it fixes something the spec already admitted: restore
+     * moves a row sideways (x +12) and sweep used to lift it (y −6), so the two
+     * halves of the same promise did not mirror each other. Now they do. Out to
+     * the LEFT, back in from the left. A sweep should move things sideways;
+     * that is what the word means and what the broom implies.
+     *
+     * ⚑ The easing is ease-IN, not the standard ease-in-out. A pluck starts
+     * where the finger is and accelerates away; easing out at the end would
+     * make it a slide, which is a different gesture entirely.
+     *
+     * popLayout lets the kept rows reflow underneath them, and the stagger is
+     * capped so a big sweep still ends quickly.
+     */
     <motion.div ref={row} className={s.row} layout="position" data-menu={menu} data-row tabIndex={0} role="listitem" onKeyDown={onRowKey}
-      exit={animate ? { opacity: 0, y: -6, transition: { duration: .22, delay: Math.min(i, 12) * .018, ease: [.4, 0, .2, 1] } } : undefined}>
+      exit={animate ? { opacity: 0, x: -34, transition: { duration: .24, delay: Math.min(i, 12) * .018, ease: [.32, 0, .67, 0] } } : undefined}>
       <span className={s.time}>{flowTime(t)}</span>
       <span className={s.text}>
         {retrying ? <span className={s.skeleton} aria-label="Retrying" /> : text ? <>{text}{e.transcriptOrigin === 'staged' && <span className={s.staged}>Staged for this concept: there is no audio to transcribe, so this one recovery is scripted.</span>}</> : (
