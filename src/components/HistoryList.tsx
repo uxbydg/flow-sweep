@@ -116,11 +116,34 @@ function Row({ e, i, onSweep, onRetry, retrying, animate }: { e: Entry; i: numbe
      * where the finger is and accelerates away; easing out at the end would
      * make it a slide, which is a different gesture entirely.
      *
+     * ⚑⚑ AND IT HAS TO TRAVEL. The first attempt moved 34px and faded in place,
+     * which reads as the row evaporating rather than being removed. The card
+     * sits inset from the left with empty margin beside it, so a row can slide
+     * OUT of its slot into that margin and dissolve there. Daniel drew exactly
+     * that: a box in the left margin with an arrow pointing into it.
+     *
+     * ⚑ The card cannot clip: "no overflow clipping on the card or its rows,
+     * tooltips and the More menu hang past the edge, as in Flow" (App.module.scss).
+     * So the margin does the work a clip would, and the travel stops short of
+     * the sidebar.
+     *
      * popLayout lets the kept rows reflow underneath them, and the stagger is
      * capped so a big sweep still ends quickly.
      */
     <motion.div ref={row} className={s.row} layout="position" data-menu={menu} data-row tabIndex={0} role="listitem" onKeyDown={onRowKey}
-      exit={animate ? { opacity: 0, x: -34, transition: { duration: .24, delay: Math.min(i, 12) * .018, ease: [.32, 0, .67, 0] } } : undefined}>
+      exit={animate ? {
+        // ⚑ Travels into the empty margin left of the card, then dissolves there.
+        // 34px was a nudge that faded in place; this is a stroke that removes the
+        // row from where it sat. Opacity holds for the first 55% so the eye
+        // follows the row OUT rather than watching it evaporate.
+        opacity: [1, 1, 0], x: -168,
+        transition: {
+          duration: .34,
+          delay: Math.min(i, 12) * .018,
+          ease: [.32, 0, .67, 0],
+          opacity: { times: [0, .55, 1], duration: .34, delay: Math.min(i, 12) * .018 },
+        },
+      } : undefined}>
       <span className={s.time}>{flowTime(t)}</span>
       <span className={s.text}>
         {retrying ? <span className={s.skeleton} aria-label="Retrying" /> : text ? <>{text}{e.transcriptOrigin === 'staged' && <span className={s.staged}>Staged for this concept: there is no audio to transcribe, so this one recovery is scripted.</span>}</> : (
