@@ -59,3 +59,19 @@ export function loadDismissed(): string | null {
 export function saveDismissed(dayKey: string): void {
   try { localStorage.setItem(DISMISS, dayKey) } catch { /* private mode */ }
 }
+
+/**
+ * ⛑⛑ Dismissing the reminder hides it for the REST OF THE DAY, which is right for a
+ * person using the product and wrong for anyone trying to look at it on purpose.
+ *
+ * Found 2026-09-28 the hard way: the note-5 button seeded the batch and left this key
+ * alone, so after one press of the ✕ it did nothing at all, silently, for the rest of
+ * the day. The holding cell filled, the card never came back, and there was no div in
+ * the DOM to inspect because the gate renders nothing.
+ *
+ * ⚡ Anything whose whole job is "show me the reminder" must clear this first. A demo
+ * affordance that can be permanently disabled by a dismissal is not an affordance.
+ */
+export function clearDismissed(): void {
+  try { localStorage.removeItem(DISMISS) } catch { /* private mode */ }
+}

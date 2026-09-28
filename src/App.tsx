@@ -7,7 +7,7 @@ import type { Candidate, Entry, Reason, SweptItem } from './data/types.ts'
 import { OPT_IN } from './sweep/labels.ts'
 import {
   now as clock, demoReminder, HOLD_DAYS, leavesOn, isExpired,
-  loadSwept, saveSwept, loadGone, saveGone, loadDismissed, saveDismissed,
+  loadSwept, saveSwept, loadGone, saveGone, loadDismissed, saveDismissed, clearDismissed,
 } from './sweep/holding.ts'
 import { toDate, dayKey, dayLabel, startOfDay } from './format.ts'
 import { Titlebar, Sidebar, Banner, Stats } from './components/Chrome.tsx'
@@ -87,7 +87,10 @@ export default function App() {
       saveGone([...loadGone(), ...expired.map(it => it.id)])
     }
     // ?demo=reminder seeds a batch that leaves tonight, on top of anything already swept.
-    if (demoReminder) items = seedReminderBatch(items)
+    /* ⚡ ?demo=reminder has the same job as the note-5 button, so it clears the same
+       flag. A URL whose only purpose is to show the card must not be defeated by a
+       dismissal the reader made an hour ago. */
+    if (demoReminder) { clearDismissed(); items = seedReminderBatch(items) }
     return items
   })
   const [view, setView] = useState<'history' | 'cell'>('history')
@@ -132,6 +135,11 @@ export default function App() {
   const onNoteDemo = useCallback((id: string) => {
     if (id !== 'reminder') return
     setSwept(prev => seedReminderBatch(prev))
+    /* ⛑ Clear the dismissal FIRST-class, not as an afterthought. Without this the
+       button seeds the cell and renders nothing, silently, for the rest of any day on
+       which the card was closed once. That is exactly how it failed on 28 September. */
+    clearDismissed()
+    setDismissed(null)
     setView('history')
     setSweepOpen(false)
   }, [])
