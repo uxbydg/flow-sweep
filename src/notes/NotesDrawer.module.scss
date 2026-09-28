@@ -273,28 +273,47 @@
   padding-left: 12px;
 }
 
-/* ⛑ The one control in a drawer that is otherwise all reading. It sits on the
-   drawer's own surface, not Flow's, and it is deliberately quiet: this is a
-   footnote you can press, not a call to action competing with the note. */
+/* ⛑ THE ONE CONTROL IN A DRAWER THAT IS OTHERWISE ALL READING.
+   Daniel, 2026-09-28: "it needs to look like the same kind of button, and you
+   can't tell it's a button."
+
+   ⚡ The first pass drew a hairline box on the drawer's own background, which is
+   the shape of a disabled input, not a button. The drawer already HAS a button
+   treatment: .navBtn above is FILLED with --line and carries no border. So this
+   takes the same fill, and the arrow gives it somewhere to go.
+
+   It sits flush on the Evidence rule rather than floating above it, so it reads as
+   part of the drawer's structure instead of a stray element in the whitespace. */
 .demoBtn {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   width: calc(100% - 52px);
-  margin: 0 26px 0;
-  padding: 11px 14px;
-  border: 1px solid var(--line);
+  margin: 0 26px 0;   /* ⚡ flush: it sits ON the Evidence rule, not floating above it */
+  padding: 12px 14px;
+  border: 0;
   border-radius: 9px;
-  background: var(--page);
+  background: var(--line);
   color: var(--ink);
   font: inherit;
   font-size: 12.5px;
+  font-weight: 500;
   text-align: left;
   cursor: pointer;
-  transition: background .14s ease, border-color .14s ease;
+  transition: background .14s ease, filter .14s ease;
 }
-/* ⚡ Background and border only. No transform: a hover that moves the target
+.demoBtn::after {
+  content: '\2192';
+  font-size: 14px;
+  color: var(--note-quiet);
+  transition: color .14s ease;
+}
+/* ⚡ Fill and glyph only, never a transform. A hover that moves the target
    retracts its own hit box and loops the hover. [[hover-transform-rule]] */
-.demoBtn:hover { background: var(--surface); border-color: var(--ink-3, var(--line)); }
-.demoBtn:focus-visible { outline: 2px solid var(--accent, currentColor); outline-offset: 2px; }
+.demoBtn:hover { filter: brightness(0.96); }
+.demoBtn:hover::after { color: var(--ink); }
+.demoBtn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
 .evidence {
   background: var(--page);
