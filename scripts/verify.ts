@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { detect, summarize, DEFAULT_THRESHOLD, textOf, appLabel } from '../src/sweep/detect.ts'
 import type { Entry } from '../src/data/types.ts'
-const entries: Entry[] = JSON.parse(readFileSync(new URL('../src/data/history.private.json', import.meta.url), 'utf8'))
+const entries: Entry[] = JSON.parse(readFileSync(new URL('../src/data/history.sample.json', import.meta.url), 'utf8'))
 const cands = detect(entries)
 const s = summarize(entries, cands)
 console.log(`total ${s.total}  empty ${s.empty}  cutoff ${s.cutoff}  reply ${s.reply}  flagged ${s.flagged}  candidates ${s.candidates}  share ${(s.share*100).toFixed(1)}%`)

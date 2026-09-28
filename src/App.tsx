@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence } from 'motion/react'
 import s from './App.module.scss'
-import { entries as allEntries, usingRealData } from './data/load.ts'
+import { entries as allEntries } from './data/load.ts'
 import { detect, summarize, appLabel, textOf, DEFAULT_THRESHOLD } from './sweep/detect.ts'
 import type { Candidate, Entry, Reason, SweptItem } from './data/types.ts'
 import { OPT_IN } from './sweep/labels.ts'
@@ -392,7 +392,7 @@ export default function App() {
               ? <div data-note="cell"><HoldingCell items={swept} byId={byId} reasons={reasonOf} now={t} onRestore={restore} onRestoreMany={restoreMany} /></div>
               : <HistoryList key={filterBlank ? 'blank' : 'all'} entries={visible} now={t} onSweepOne={sweepOne} onRetry={id => retry([id])} retrying={retrying} />}
             {view === 'history' && (
-              <p className={s.more}>{live.length} transcripts · {usingRealData ? 'real history, local only' : 'sample data'}</p>
+              <p className={s.more}>{live.length} transcripts · real counts, generated text</p>
             )}
           </div>
 

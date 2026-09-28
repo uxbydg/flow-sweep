@@ -1,4 +1,18 @@
-# ⛑⛑⛑ Never run `vercel` from this directory
+# ✅ CLOSED 2026-09-28. Kept for the reasoning.
+
+> The code path described below **no longer exists**. `src/data/load.ts` imports one
+> file, `history.sample.json`, and nothing else. There is no glob, so no local build can
+> carry private data and `vercel --prod` from this folder is no longer dangerous.
+>
+> ⚡ **Measured proof:** a plain `npm run build` went from **3,201 kB to 1,824 kB**. The
+> 1,377 kB that disappeared is the private export that had been bundled into every build.
+> A scan of the output for Tanay, Home Depot, Everlaw, Woodforest, resign and recruiter
+> comes back empty, and `verify.ts` still reports 1475 / 199 / 179 / 13.5%.
+>
+> The original write-up follows, because the reasoning is worth keeping: it is the case
+> study in a flag that reads as a safety control and is not one.
+
+# ⛑ The hazard, as it stood on 26 September
 
 Found 2026-09-26 while deploying a copy change. **Not currently exploited, and the live site is
 clean**, but the guard that is supposed to prevent it does not work.
