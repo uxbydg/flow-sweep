@@ -87,4 +87,21 @@ export interface Note<Mode extends string = string> {
     sign: string
   }
   evidence?: { label: string; url?: string }
+  /**
+   * ⛑⛑ A STATE THE READER CANNOT REACH BY LOOKING.
+   *
+   * Some notes argue about something that only appears on a particular day. The
+   * seven-day reminder is the case that forced this: it was reachable only at
+   * `?demo=reminder`, a URL nobody is told about, so the one note that promises
+   * "undo is a place" had no way to show the place. Daniel, 2026-09-28: "how are
+   * people going to be able to bring up the card... we need to be able to put
+   * that somewhere where they can essentially say Turn on so they can view it."
+   *
+   * ⚡ It lives HERE, on the note, and never in the product's own chrome. The
+   * app reproduces Flow for fidelity and Flow has no demo buttons; a control in
+   * the list header would be both a lie about the product and instructional text
+   * in the UI, which is a standing rule against. The notes layer is already the
+   * surface that says "this is a prototype", so the affordance belongs to it.
+   */
+  demo?: { label: string; id: string }
 }

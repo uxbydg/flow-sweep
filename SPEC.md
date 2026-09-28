@@ -4,7 +4,7 @@
 > Summary sheet became one card the broom unfolds above the list (14 September), and the numbers were
 > re-run against the code on 15 September. ⛑ **RE-EXPORTED 23 September and renumbered 25 September
 > before recording.** Current counts on the real **1,470** (8 August to 24 September 2026): **148 empty,
-> 50 cut off (17 sure, 33 asked about), 1 marked for removal, 64 short replies, 4 to retry; 179
+> 50 cut off (30 sure, 20 asked about), 1 marked for removal, 64 short replies, 4 to retry; 179
 > preselected, 199 candidates, about 1 in 8.** ⚑ Includes five demo rows, see below. Verified against the running app, not computed by hand.
 > The September export of 874 is kept as `history.private.874.json` and every count below is the new one.
 
@@ -17,7 +17,7 @@ them somewhere you can get them back from. Built against one real user's 1,470 e
 | Section | Rule | Real history (1,470) | Selected by default |
 |---|---|---|---|
 | **Empty** | no text after trim, or Flow's own status is `dismissed` / `no_audio` / `empty` | 148 | yes |
-| **Cut off** | under 20 characters and the thought did not finish: punctuation only, stops on a comma, on a dangling word ("the", "to", "is"), or mid-word ("pa", "re-b") | 48 (15 selected, 33 shown as borderline) | when confidence ≥ 0.60 |
+| **Cut off** | under 20 characters and the thought did not finish: punctuation only, stops on a comma, on a dangling word ("the", "to", "is"), or mid-word ("pa", "re-b") | 50 (30 selected, 20 shown as borderline) | when confidence ≥ 0.60 |
 | **Flagged by you** | the entry names its own fate ("never mind", "scratch that", "oops"...) at its start, or anywhere in an entry under 40 chars | 1 | yes |
 | **Short replies** | under 20 characters and finished: ends in . ! or ? and not on a dangling word | 64 | **never**; listed last, collapsed |
 
@@ -36,9 +36,24 @@ Confidence: Empty 0.98 (0.90 if over 30 s recorded). Punctuation only 0.97. Mid-
 dangling word 0.90, trailing comma 0.85, single fragment ≤3 chars 0.85. No ending but nothing visibly
 broken ("Excel", "Run it", "right now") 0.50: shown, not selected. Flagged 0.70. Short reply 0.20.
 Result: **199 candidates, 179 selected, about 1 in 8**.
-⚑ Verified against the running app on 25 September: the card says "Flow will sweep 122 transcripts",
-the broom says 138 to review, and the strip reads Empty 97, Cut off 12, Marked for removal 1. An
-earlier draft of this line said 141 and 125, which were the counts before the 15 September re-run.
+⛑ **Re-verified 26 September by running `scripts/verify.ts` against the real export**, after the
+video was filmed and the count said out loud was questioned:
+
+```
+total 1475  empty 148  cutoff 50  reply 64  flagged 1  candidates 199  share 13.5%
+preselected at 0.6: 179   borderline: 88
+```
+
+⚑ **199 = 148 + 50 + 1, so every candidate really is empty, cut off, or flagged.** That matters,
+because the video sweeps all 199 with Select all and calls them "either empty, cut off, marked for
+removal", and that sentence is exactly true.
+
+⚡ **borderline 88 is a different set from the 20 unselected candidates**: 64 short replies + 20
+sub-threshold candidates + 4 retries. Reading 88 as "the ones Sweep asks about" is the easy mistake.
+
+⛑ The line that stood here claimed 122 / 138 / Empty 97 and said it was verified on 25 September.
+Those are 874-export numbers and they contradicted the header of this same file. A stale
+"verified" line is worse than no line, because it is the one a reader trusts.
 
 ## The four states
 

@@ -64,6 +64,7 @@ function ProblemBlock({ problem }: { problem: Problem }) {
 }
 
 export function NotesDrawer({
+  onDemo,
   activeId,
   onStep,
   onClose,
@@ -71,6 +72,8 @@ export function NotesDrawer({
   activeId: number
   onStep: (delta: number) => void
   onClose: () => void
+  /** Runs a note's `demo`, when it has one. The host decides what the id means. */
+  onDemo?: (id: string) => void
 }) {
   const i = NOTES.findIndex((n) => n.id === activeId)
   const note = NOTES[i]
@@ -238,6 +241,16 @@ export function NotesDrawer({
       {/* ⚑ Renamed. "What the posting asks for" read as a riddle. This says
           plainly where the words come from and lets the sentence beneath do
           the connecting. */}
+      {/* ⛑ Rendered only when the note carries one, and worded as the thing it
+          shows rather than as an instruction. "Show the day-seven reminder" names
+          a state; "click here to see the reminder" would be narrating the UI,
+          which is a standing rule against. */}
+      {note.demo && onDemo && (
+        <button type="button" className={s.demoBtn} onClick={() => onDemo(note.demo!.id)}>
+          {note.demo.label}
+        </button>
+      )}
+
       <p className={s.evidence}>
         <strong>Evidence.</strong> {note.evidence?.label}
       </p>

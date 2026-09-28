@@ -26,6 +26,34 @@ import { useNotes } from './notes/useNotes.ts'
 import { useNudge } from './notes/useNudge.ts'
 
 const DAY = 864e5
+
+/**
+ * Back-date a batch so it is due to leave tonight, which is the only way to see the
+ * day-seven reminder without waiting a week.
+ *
+ * ⛑ EXTRACTED 2026-09-28. This used to live inline in the swept initialiser and ran
+ * only when `?demo=reminder` was in the URL, which meant the reminder was reachable
+ * only by someone who had been told the parameter exists. Note 5 promises "undo is a
+ * place" and had no way to show the place. It is a function now so the notes drawer
+ * can call it on demand; the URL parameter still works and is unchanged.
+ *
+ * Works from any state: unswept rows first, and if a reason runs short (after a full
+ * sweep, say) rows already in the cell are back-dated instead, so it never comes up empty.
+ */
+function seedReminderBatch(items: SweptItem[]): SweptItem[] {
+  if (items.some(it => leavesOn(it) === startOfDay(clock()))) return items
+  const cands = detect(allEntries).filter(c => !OPT_IN.includes(c.reason) && c.confidence >= DEFAULT_THRESHOLD)
+  const have = new Set(items.map(it => it.id))
+  const reasonOfId = new Map(cands.map(c => [c.entry.id, c.reason]))
+  const seedAt = clock() - HOLD_DAYS * DAY
+  for (const [r, n] of [['empty', 8], ['cutoff', 3], ['flagged', 1]] as [Reason, number][]) {
+    const fresh = cands.filter(c => c.reason === r && !have.has(c.entry.id)).slice(0, n)
+    items = [...items, ...fresh.map(c => ({ id: c.entry.id, sweptAt: seedAt }))]
+    let short = n - fresh.length
+    items = items.map(it => short > 0 && reasonOfId.get(it.id) === r && it.sweptAt !== seedAt ? (short--, { ...it, sweptAt: seedAt }) : it)
+  }
+  return items
+}
 const RECOVERED_TEXT = 'Okay, go back to the punch list and take the top three in order. Start with the header, then the card art, then the footer. Show me each one in the browser before you move on to the next.'
 const byId = new Map<string, Entry>(allEntries.map(e => [e.id, e]))
 // Reason at classification time, so the holding cell can say why a row was swept.
@@ -59,20 +87,7 @@ export default function App() {
       saveGone([...loadGone(), ...expired.map(it => it.id)])
     }
     // ?demo=reminder seeds a batch that leaves tonight, on top of anything already swept.
-    if (demoReminder && !items.some(it => leavesOn(it) === startOfDay(clock()))) {
-      const cands = detect(allEntries).filter(c => !OPT_IN.includes(c.reason) && c.confidence >= DEFAULT_THRESHOLD)
-      // Works from any state: unswept rows first; if a reason runs short (after a full sweep, say),
-      // rows already in the cell are back-dated instead, so the demo never comes up empty.
-      const have = new Set(items.map(it => it.id))
-      const reasonOfId = new Map(cands.map(c => [c.entry.id, c.reason]))
-      const seedAt = clock() - HOLD_DAYS * DAY
-      for (const [r, n] of [['empty', 8], ['cutoff', 3], ['flagged', 1]] as [Reason, number][]) {
-        const fresh = cands.filter(c => c.reason === r && !have.has(c.entry.id)).slice(0, n)
-        items = [...items, ...fresh.map(c => ({ id: c.entry.id, sweptAt: seedAt }))]
-        let short = n - fresh.length
-        items = items.map(it => short > 0 && reasonOfId.get(it.id) === r && it.sweptAt !== seedAt ? (short--, { ...it, sweptAt: seedAt }) : it)
-      }
-    }
+    if (demoReminder) items = seedReminderBatch(items)
     return items
   })
   const [view, setView] = useState<'history' | 'cell'>('history')
@@ -106,6 +121,19 @@ export default function App() {
     setView(m === 'cell' ? 'cell' : 'history')
     setSweepOpen(m === 'sweep')
     if (m !== 'history') setBlankIds(null)
+  }, [])
+  /**
+   * ⛑ Runs a note's demo. Note 5 is the only one with one today: it promises the
+   * seven-day hold, so it can show the day the hold runs out.
+   *
+   * ⚡ It seeds AND goes to the history view, because the reminder renders there.
+   * Seeding while the reader sits in the holding cell would fire the card behind them.
+   */
+  const onNoteDemo = useCallback((id: string) => {
+    if (id !== 'reminder') return
+    setSwept(prev => seedReminderBatch(prev))
+    setView('history')
+    setSweepOpen(false)
   }, [])
   const notes = useNotes<SweepMode>(NOTES as never, applyNoteMode)
   /* ⚑ Nudges only while the notes have never been opened. */
@@ -398,7 +426,7 @@ export default function App() {
       </button>
 
       {notes.on && notes.activeId !== null && (
-        <NotesDrawer activeId={notes.activeId} onStep={notes.step} onClose={notes.close} />
+        <NotesDrawer activeId={notes.activeId} onStep={notes.step} onClose={notes.close} onDemo={onNoteDemo} />
       )}
 
       {toast && <Toast text={toast} />}

@@ -273,6 +273,29 @@
   padding-left: 12px;
 }
 
+/* ⛑ The one control in a drawer that is otherwise all reading. It sits on the
+   drawer's own surface, not Flow's, and it is deliberately quiet: this is a
+   footnote you can press, not a call to action competing with the note. */
+.demoBtn {
+  display: block;
+  width: calc(100% - 52px);
+  margin: 0 26px 0;
+  padding: 11px 14px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--page);
+  color: var(--ink);
+  font: inherit;
+  font-size: 12.5px;
+  text-align: left;
+  cursor: pointer;
+  transition: background .14s ease, border-color .14s ease;
+}
+/* ⚡ Background and border only. No transform: a hover that moves the target
+   retracts its own hit box and loops the hover. [[hover-transform-rule]] */
+.demoBtn:hover { background: var(--surface); border-color: var(--ink-3, var(--line)); }
+.demoBtn:focus-visible { outline: 2px solid var(--accent, currentColor); outline-offset: 2px; }
+
 .evidence {
   background: var(--page);
   border-top: 1px solid var(--line);

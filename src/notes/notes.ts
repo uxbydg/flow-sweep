@@ -137,6 +137,10 @@ export const NOTES: Note<SweepMode>[] = [
     impact:
       'It converts the riskiest action in the product into a reversible one, which is what lets it be offered in bulk at all. Without the hold this feature cannot ship past a legal review, let alone a user.',
     evidence: { label: 'SPEC.md, "Decided 14 September (Daniel)"' },
+    /* ⚡ The control sits on THIS note and no other, because this is the note
+       that makes the promise. A reader arrives at "restorable for seven days,
+       and then they go", and the thing that proves it is one button away. */
+    demo: { label: 'Show the day-seven reminder', id: 'reminder' },
   },
   {
     id: 6,
@@ -197,7 +201,7 @@ export const NOTES: Note<SweepMode>[] = [
       ],
       provenance: [
         'The counts throughout come from one real Wispr Flow export of 1,470 entries, 8 August to 24 September 2026, Daniel\u2019s own, held locally and gitignored, with no audio.',
-        'The public build reads a generated sample matched to the real distribution of length, app, and category, with no real text in it, so nothing dictated in private is published.',
+        'The public build carries the real structure of that export, every count and every ratio, with all 1,212 long rows replaced by generated text and every URL removed, so the numbers you can check are real and nothing dictated in private is published.',
         'And the honest limit: one user is not research. These numbers describe one history well and nobody else\u2019s at all, which is why every rule here is offered as something to test rather than something settled.',
       ],
       sign: 'Daniel Glaze',
