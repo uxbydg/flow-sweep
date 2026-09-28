@@ -103,5 +103,12 @@ export interface Note<Mode extends string = string> {
    * in the UI, which is a standing rule against. The notes layer is already the
    * surface that says "this is a prototype", so the affordance belongs to it.
    */
-  demo?: { label: string; id: string }
+  demo?: {
+    /** Shown when the state is OFF, and pressing it turns the state on. */
+    label: string
+    /** Shown when the state is ON. Its presence is what makes the control a toggle
+        rather than a one-way action, so the button always states the current truth. */
+    labelOn?: string
+    id: string
+  }
 }

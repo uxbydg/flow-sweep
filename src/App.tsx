@@ -125,24 +125,6 @@ export default function App() {
     setSweepOpen(m === 'sweep')
     if (m !== 'history') setBlankIds(null)
   }, [])
-  /**
-   * ⛑ Runs a note's demo. Note 5 is the only one with one today: it promises the
-   * seven-day hold, so it can show the day the hold runs out.
-   *
-   * ⚡ It seeds AND goes to the history view, because the reminder renders there.
-   * Seeding while the reader sits in the holding cell would fire the card behind them.
-   */
-  const onNoteDemo = useCallback((id: string) => {
-    if (id !== 'reminder') return
-    setSwept(prev => seedReminderBatch(prev))
-    /* ⛑ Clear the dismissal FIRST-class, not as an afterthought. Without this the
-       button seeds the cell and renders nothing, silently, for the rest of any day on
-       which the card was closed once. That is exactly how it failed on 28 September. */
-    clearDismissed()
-    setDismissed(null)
-    setView('history')
-    setSweepOpen(false)
-  }, [])
   const notes = useNotes<SweepMode>(NOTES as never, applyNoteMode)
   /* ⚑ Nudges only while the notes have never been opened. */
   const nudging = useNudge(!notes.on)
@@ -299,6 +281,32 @@ export default function App() {
   // The reminder shows only on a day a batch reaches the end of its hold.
   const leavingToday = useMemo(() => swept.filter(it => leavesOn(it) === startOfDay(t)), [swept, t])
   const showReminder = leavingToday.length > 0 && dismissed !== today && view === 'history'
+
+  /**
+   * ⛑⛑ AN ON/OFF SWITCH, because a one-way button was not one.
+   *
+   * Daniel, 2026-09-28, after the card refused to appear: "how do I ensure this doesn't
+   * happen again? Is there just an on-and-off switch we can do?" The honest answer was
+   * no: the previous control only ever turned the card ON, so any state that suppressed
+   * it left a button that looked live and did nothing.
+   *
+   * ⚡ A toggle cannot fail that way, because it reads the state it is about. The label
+   * says which way it will go, so the control and the screen can never disagree.
+   *
+   * This is demo scaffolding and is meant to be: the point is to show the day-seven
+   * state exists and was designed, not to reimplement a scheduler.
+   */
+  const reminderOn = leavingToday.length > 0 && dismissed !== today
+  const onNoteDemo = useCallback((id: string) => {
+    if (id !== 'reminder') return
+    if (reminderOn) { setDismissed(today); saveDismissed(today); return }
+    setSwept(prev => seedReminderBatch(prev))
+    clearDismissed()
+    setDismissed(null)
+    setView('history')
+    setSweepOpen(false)
+  }, [reminderOn, today])
+  const demoActive = useCallback((id: string) => id === 'reminder' && reminderOn, [reminderOn])
   const leavingCounts = useMemo(() => {
     const out: Partial<Record<Reason, number>> = {}
     for (const it of leavingToday) { const r = reasonOf.get(it.id) ?? 'empty'; out[r] = (out[r] ?? 0) + 1 }
@@ -434,7 +442,7 @@ export default function App() {
       </button>
 
       {notes.on && notes.activeId !== null && (
-        <NotesDrawer activeId={notes.activeId} onStep={notes.step} onClose={notes.close} onDemo={onNoteDemo} />
+        <NotesDrawer activeId={notes.activeId} onStep={notes.step} onClose={notes.close} onDemo={onNoteDemo} demoActive={demoActive} />
       )}
 
       {toast && <Toast text={toast} />}

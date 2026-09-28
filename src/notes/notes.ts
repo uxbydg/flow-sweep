@@ -140,7 +140,7 @@ export const NOTES: Note<SweepMode>[] = [
     /* ⚡ The control sits on THIS note and no other, because this is the note
        that makes the promise. A reader arrives at "restorable for seven days,
        and then they go", and the thing that proves it is one button away. */
-    demo: { label: 'Show the day-seven reminder', id: 'reminder' },
+    demo: { label: 'Show the day-seven reminder', labelOn: 'Hide the day-seven reminder', id: 'reminder' },
   },
   {
     id: 6,

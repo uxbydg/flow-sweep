@@ -65,6 +65,7 @@ function ProblemBlock({ problem }: { problem: Problem }) {
 
 export function NotesDrawer({
   onDemo,
+  demoActive,
   activeId,
   onStep,
   onClose,
@@ -74,6 +75,8 @@ export function NotesDrawer({
   onClose: () => void
   /** Runs a note's `demo`, when it has one. The host decides what the id means. */
   onDemo?: (id: string) => void
+  /** Whether a demo's state is currently on. Supplying it makes the control a toggle. */
+  demoActive?: (id: string) => boolean
 }) {
   const i = NOTES.findIndex((n) => n.id === activeId)
   const note = NOTES[i]
@@ -245,11 +248,16 @@ export function NotesDrawer({
           shows rather than as an instruction. "Show the day-seven reminder" names
           a state; "click here to see the reminder" would be narrating the UI,
           which is a standing rule against. */}
-      {note.demo && onDemo && (
-        <button type="button" className={s.demoBtn} onClick={() => onDemo(note.demo!.id)}>
-          {note.demo.label}
-        </button>
-      )}
+      {note.demo && onDemo && (() => {
+        const on = demoActive?.(note.demo.id) ?? false
+        return (
+          <button type="button" className={s.demoBtn} data-on={on || undefined}
+            aria-pressed={note.demo.labelOn ? on : undefined}
+            onClick={() => onDemo(note.demo!.id)}>
+            {on && note.demo!.labelOn ? note.demo!.labelOn : note.demo!.label}
+          </button>
+        )
+      })()}
 
       <p className={s.evidence}>
         <strong>Evidence.</strong> {note.evidence?.label}

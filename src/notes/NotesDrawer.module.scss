@@ -609,3 +609,9 @@
   color: var(--ink);
   margin: 0 0 14px;
 }
+
+/* ⚡ The toggle's ON state. A filled control that has already done its job should look
+   like it is holding a position, not like it is waiting to be pressed, so the arrow
+   turns back on itself and the fill deepens a step. */
+.demoBtn[data-on]::after { content: '\2190'; }
+.demoBtn[data-on] { filter: brightness(0.94); }
